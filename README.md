@@ -1,5 +1,5 @@
 
-# yellowstone_logistics_llc_s_application2
+# fibroskin-beauty-academy
 ### Table of contents
 - [System requirements](#system-requirements)
 - [Figma design guidelines for better UI accuracy](#figma-design-guideline-for-better-accuracy)
