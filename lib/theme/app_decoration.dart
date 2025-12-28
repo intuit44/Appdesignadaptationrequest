@@ -13,7 +13,7 @@ class AppDecoration {
   static BoxDecoration get fillWhiteA =>
       BoxDecoration(color: appTheme.whiteA700);
   static BoxDecoration get fillWhiteA700 =>
-      BoxDecoration(color: appTheme.whiteA700.withOpacity(0.53));
+      BoxDecoration(color: appTheme.whiteA700.withValues(alpha: 0.53));
   static BoxDecoration get fillYellow =>
       BoxDecoration(color: appTheme.yellow100);
   // Gradient decorations
@@ -29,7 +29,7 @@ class AppDecoration {
     color: appTheme.whiteA700,
     boxShadow: [
       BoxShadow(
-        color: appTheme.black90001.withOpacity(0.05),
+        color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
         offset: Offset(0, 50),
@@ -40,7 +40,7 @@ class AppDecoration {
     color: appTheme.whiteA700,
     boxShadow: [
       BoxShadow(
-        color: appTheme.black90001.withOpacity(0.1),
+        color: appTheme.black90001.withValues(alpha: 0.1),
         spreadRadius: 2.h,
         blurRadius: 2.h,
         offset: Offset(0, 50),
@@ -51,7 +51,7 @@ class AppDecoration {
     color: appTheme.whiteA700,
     boxShadow: [
       BoxShadow(
-        color: appTheme.black90001.withOpacity(0.05),
+        color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
         offset: Offset(0, 50),
@@ -62,7 +62,7 @@ class AppDecoration {
     color: appTheme.whiteA700,
     boxShadow: [
       BoxShadow(
-        color: appTheme.black90001.withOpacity(0.1),
+        color: appTheme.black90001.withValues(alpha: 0.1),
         spreadRadius: 2.h,
         blurRadius: 2.h,
         offset: Offset(0, 50),
@@ -73,7 +73,7 @@ class AppDecoration {
     color: appTheme.indigo50,
     boxShadow: [
       BoxShadow(
-        color: appTheme.black90001.withOpacity(0.05),
+        color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
         offset: Offset(0, 50),

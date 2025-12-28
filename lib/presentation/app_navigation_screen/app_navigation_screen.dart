@@ -151,9 +151,19 @@ class AppNavigationScreenState extends ConsumerState<AppNavigationScreen> {
       builder: (context) {
         return AlertDialog(
           contentPadding: EdgeInsets.zero,
-          content: className,
+          // Keep DhiWise default flow (dialog), but constrain + scroll to avoid
+          // RenderFlex overflow (esp. when the keyboard opens on smaller screens).
+          insetPadding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 24.h),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            child: SingleChildScrollView(
+              child: className,
+            ),
+          ),
           backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.zero,
         );
       },
     );

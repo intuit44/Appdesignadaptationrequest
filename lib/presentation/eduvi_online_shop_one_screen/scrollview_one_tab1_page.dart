@@ -455,12 +455,14 @@ class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
                   height: 30.h,
                   width: 30.h,
                 ),
-                Align(
-                  alignment: Alignment.center,
+                Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(left: 12.h),
                     child: Text(
                       "lbl_educatsy".tr,
+                      // Allow wrapping in the footer (no height constraint here)
+                      // to avoid horizontal RenderFlex overflows.
+                      softWrap: true,
                       style: theme.textTheme.headlineLarge,
                     ),
                   ),

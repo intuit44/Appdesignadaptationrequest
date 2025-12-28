@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
-extension on TextStyle {
+/// Extension to apply Inter font family to any TextStyle
+extension InterFontExtension on TextStyle {
   TextStyle get inter {
     return copyWith(fontFamily: 'Inter');
   }
@@ -13,7 +14,7 @@ extension on TextStyle {
 class CustomTextStyles {
   // Body text style
   static TextStyle get bodyLargeWhiteA700 => theme.textTheme.bodyLarge!
-      .copyWith(color: appTheme.whiteA700.withOpacity(0.7));
+      .copyWith(color: appTheme.whiteA700.withValues(alpha: 0.7));
   // Headline text style
   static TextStyle get headlineLargeBold => theme.textTheme.headlineLarge!
       .copyWith(fontSize: 32.fSize, fontWeight: FontWeight.w700);
@@ -29,10 +30,9 @@ class CustomTextStyles {
       theme.textTheme.headlineSmall!.copyWith(fontSize: 24.fSize);
   static TextStyle get headlineSmallBlack90001 =>
       theme.textTheme.headlineSmall!.copyWith(color: appTheme.black90001);
-  static TextStyle get headlineSmallBlack9000124 => theme
-      .textTheme
-      .headlineSmall!
-      .copyWith(color: appTheme.black90001, fontSize: 24.fSize);
+  static TextStyle get headlineSmallBlack9000124 =>
+      theme.textTheme.headlineSmall!
+          .copyWith(color: appTheme.black90001, fontSize: 24.fSize);
   static TextStyle get headlineSmallMedium => theme.textTheme.headlineSmall!
       .copyWith(fontSize: 24.fSize, fontWeight: FontWeight.w500);
   // Title text style
@@ -52,10 +52,9 @@ class CustomTextStyles {
         fontSize: 18.fSize,
         fontWeight: FontWeight.w600,
       );
-  static TextStyle get titleMediumBlack90001SemiBold_1 => theme
-      .textTheme
-      .titleMedium!
-      .copyWith(color: appTheme.black90001, fontWeight: FontWeight.w600);
+  static TextStyle get titleMediumBlack90001SemiBold_1 =>
+      theme.textTheme.titleMedium!
+          .copyWith(color: appTheme.black90001, fontWeight: FontWeight.w600);
   static TextStyle get titleMediumBlack90001_1 =>
       theme.textTheme.titleMedium!.copyWith(color: appTheme.black90001);
   static TextStyle get titleMediumBlack90001_2 =>
@@ -67,24 +66,22 @@ class CustomTextStyles {
   static TextStyle get titleMediumDeeppurpleA200 =>
       theme.textTheme.titleMedium!.copyWith(color: appTheme.deepPurpleA200);
   static TextStyle get titleMediumGray700 => theme.textTheme.titleMedium!
-      .copyWith(color: appTheme.gray700.withOpacity(0.6));
+      .copyWith(color: appTheme.gray700.withValues(alpha: 0.6));
   static TextStyle get titleMediumGray90001 => theme.textTheme.titleMedium!
       .copyWith(color: appTheme.gray90001, fontWeight: FontWeight.w600);
-  static TextStyle get titleMediumGray90001SemiBold => theme
-      .textTheme
-      .titleMedium!
-      .copyWith(color: appTheme.gray90001, fontWeight: FontWeight.w600);
+  static TextStyle get titleMediumGray90001SemiBold =>
+      theme.textTheme.titleMedium!
+          .copyWith(color: appTheme.gray90001, fontWeight: FontWeight.w600);
   static TextStyle get titleMediumGray90001_1 =>
       theme.textTheme.titleMedium!.copyWith(color: appTheme.gray90001);
   static TextStyle get titleMediumGray90001_2 => theme.textTheme.titleMedium!
-      .copyWith(color: appTheme.gray90001.withOpacity(0.4));
+      .copyWith(color: appTheme.gray90001.withValues(alpha: 0.4));
   static TextStyle get titleMediumGray90001_3 => theme.textTheme.titleMedium!
-      .copyWith(color: appTheme.gray90001.withOpacity(0.4));
+      .copyWith(color: appTheme.gray90001.withValues(alpha: 0.4));
   static TextStyle get titleMediumPrimary =>
       theme.textTheme.titleMedium!.copyWith(color: theme.colorScheme.primary);
   static TextStyle get titleMediumPrimarySemiBold => theme
-      .textTheme
-      .titleMedium!
+      .textTheme.titleMedium!
       .copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.w600);
   static TextStyle get titleMediumPrimarySemiBold18 =>
       theme.textTheme.titleMedium!.copyWith(
@@ -93,8 +90,7 @@ class CustomTextStyles {
         fontWeight: FontWeight.w600,
       );
   static TextStyle get titleMediumPrimarySemiBold_1 => theme
-      .textTheme
-      .titleMedium!
+      .textTheme.titleMedium!
       .copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.w600);
   static TextStyle get titleMediumPrimary_1 =>
       theme.textTheme.titleMedium!.copyWith(color: theme.colorScheme.primary);

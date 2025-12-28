@@ -182,7 +182,7 @@ class ScrollviewOneTab3PageState extends ConsumerState<ScrollviewOneTab3Page> {
               borderRadius: BorderRadiusStyle.roundedBorder10,
               boxShadow: [
                 BoxShadow(
-                  color: appTheme.black90001.withOpacity(0.05),
+                  color: appTheme.black90001.withValues(alpha: 0.05),
                   spreadRadius: 2.h,
                   blurRadius: 2.h,
                   offset: Offset(0, 50),
@@ -210,7 +210,7 @@ class ScrollviewOneTab3PageState extends ConsumerState<ScrollviewOneTab3Page> {
                         borderRadius: BorderRadiusStyle.roundedBorder10,
                         boxShadow: [
                           BoxShadow(
-                            color: appTheme.black90001.withOpacity(0.05),
+                            color: appTheme.black90001.withValues(alpha: 0.05),
                             spreadRadius: 2.h,
                             blurRadius: 2.h,
                             offset: Offset(0, 50),

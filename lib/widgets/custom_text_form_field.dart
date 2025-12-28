@@ -3,13 +3,13 @@ import '../core/app_export.dart';
 
 extension TextFormFieldStyleHelper on CustomTextFormField {
   static OutlineInputBorder get outlineGray => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(5.h),
-    borderSide: BorderSide(color: appTheme.gray300, width: 1),
-  );
+        borderRadius: BorderRadius.circular(5.h),
+        borderSide: BorderSide(color: appTheme.gray300, width: 1),
+      );
   static OutlineInputBorder get fillWhiteA => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(5.h),
-    borderSide: BorderSide.none,
-  );
+        borderRadius: BorderRadius.circular(5.h),
+        borderSide: BorderSide.none,
+      );
 }
 
 class CustomTextFormField extends StatelessWidget {
@@ -40,6 +40,7 @@ class CustomTextFormField extends StatelessWidget {
     this.fillColor,
     this.filled = true,
     this.validator,
+    this.autofillHints,
   }) : super(key: key);
 
   final Alignment? alignment;
@@ -92,74 +93,75 @@ class CustomTextFormField extends StatelessWidget {
 
   final FormFieldValidator<String>? validator;
 
+  final Iterable<String>? autofillHints;
+
   @override
   Widget build(BuildContext context) {
     return alignment != null
         ? Align(
-          alignment: alignment ?? Alignment.center,
-          child: textFormFieldWidget(context),
-        )
+            alignment: alignment ?? Alignment.center,
+            child: textFormFieldWidget(context),
+          )
         : textFormFieldWidget(context);
   }
 
   Widget textFormFieldWidget(BuildContext context) => Container(
-    width: width ?? double.maxFinite,
-    decoration: boxDecoration,
-    child: TextFormField(
-      scrollPadding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      controller: controller,
-      focusNode: focusNode,
-      onTapOutside: (event) {
-        if (focusNode != null) {
-          focusNode?.unfocus();
-        } else {
-          FocusManager.instance.primaryFocus?.unfocus();
-        }
-      },
-      autofocus: autofocus!,
-      style: textStyle ?? theme.textTheme.bodyLarge,
-      obscureText: obscureText!,
-      readOnly: readOnly!,
-      onTap: () {
-        onTap?.call();
-      },
-      textInputAction: textInputAction,
-      keyboardType: textInputType,
-      maxLines: maxLines ?? 1,
-      decoration: decoration,
-      validator: validator,
-    ),
-  );
+        width: width ?? double.maxFinite,
+        decoration: boxDecoration,
+        child: TextFormField(
+          scrollPadding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          controller: controller,
+          focusNode: focusNode,
+          onTapOutside: (event) {
+            if (focusNode != null) {
+              focusNode?.unfocus();
+            } else {
+              FocusManager.instance.primaryFocus?.unfocus();
+            }
+          },
+          autofocus: autofocus!,
+          style: textStyle ?? theme.textTheme.bodyLarge,
+          obscureText: obscureText!,
+          readOnly: readOnly!,
+          onTap: () {
+            onTap?.call();
+          },
+          textInputAction: textInputAction,
+          keyboardType: textInputType,
+          maxLines: maxLines ?? 1,
+          decoration: decoration,
+          validator: validator,
+          autofillHints: autofillHints,
+        ),
+      );
   InputDecoration get decoration => InputDecoration(
-    hintText: hintText ?? "",
-    hintStyle: hintStyle ?? theme.textTheme.titleSmall,
-    prefixIcon: prefix,
-    prefixIconConstraints: prefixConstraints,
-    suffixIcon: suffix,
-    suffixIconConstraints: suffixConstraints,
-    isDense: true,
-    contentPadding:
-        contentPadding ?? EdgeInsets.fromLTRB(14.h, 16.h, 14.h, 14.h),
-    fillColor: fillColor ?? appTheme.whiteA700.withOpacity(0.2),
-    filled: filled,
-    border:
-        borderDecoration ??
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5.h),
-          borderSide: BorderSide.none,
-        ),
-    enabledBorder:
-        borderDecoration ??
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5.h),
-          borderSide: BorderSide.none,
-        ),
-    focusedBorder: (borderDecoration ??
-            OutlineInputBorder(borderRadius: BorderRadius.circular(5.h)))
-        .copyWith(
+        hintText: hintText ?? "",
+        hintStyle: hintStyle ?? theme.textTheme.titleSmall,
+        prefixIcon: prefix,
+        prefixIconConstraints: prefixConstraints,
+        suffixIcon: suffix,
+        suffixIconConstraints: suffixConstraints,
+        isDense: true,
+        contentPadding:
+            contentPadding ?? EdgeInsets.fromLTRB(14.h, 16.h, 14.h, 14.h),
+        fillColor: fillColor ?? appTheme.whiteA700.withValues(alpha: 0.2),
+        filled: filled,
+        border: borderDecoration ??
+            OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.h),
+              borderSide: BorderSide.none,
+            ),
+        enabledBorder: borderDecoration ??
+            OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.h),
+              borderSide: BorderSide.none,
+            ),
+        focusedBorder: (borderDecoration ??
+                OutlineInputBorder(borderRadius: BorderRadius.circular(5.h)))
+            .copyWith(
           borderSide: BorderSide(color: theme.colorScheme.primary, width: 1),
         ),
-  );
+      );
 }

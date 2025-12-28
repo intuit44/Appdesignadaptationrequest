@@ -164,7 +164,7 @@ final Map<String, String> enUs = {
   "lbl_contact": "Contact",
   "lbl_courses": "Courses",
   "lbl_developers": "Developers",
-  "lbl_educatsy": "Educatsy",
+  "lbl_educatsy": "Fibroskin Beauty Academy",
   "lbl_email": "Email",
   "lbl_help": "Help",
   "lbl_high_school2": "High school",

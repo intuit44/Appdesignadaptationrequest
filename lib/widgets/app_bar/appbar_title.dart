@@ -3,7 +3,7 @@ import '../../core/app_export.dart';
 
 class AppbarTitle extends StatelessWidget {
   AppbarTitle({Key? key, required this.text, this.onTap, this.margin})
-    : super(key: key);
+      : super(key: key);
 
   final String text;
 
@@ -19,10 +19,18 @@ class AppbarTitle extends StatelessWidget {
         onTap: () {
           onTap?.call();
         },
-        child: Text(
-          text,
-          style: CustomTextStyles.titleLarge20.copyWith(
-            color: appTheme.black90001,
+        // Fit long titles without using ellipsis: scale down to the available
+        // width, keeping a single-line app bar.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            text,
+            maxLines: 1,
+            softWrap: false,
+            style: CustomTextStyles.titleLarge20.copyWith(
+              color: appTheme.black90001,
+            ),
           ),
         ),
       ),

@@ -6,7 +6,7 @@ import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'notifier/sign_up_notifier.dart'; // ignore_for_file: must_be_immutable
+import 'notifier/sign_up_notifier.dart';
 
 class SignUpDialog extends ConsumerStatefulWidget {
   const SignUpDialog({Key? key}) : super(key: key);
@@ -182,6 +182,7 @@ class SignUpDialogState extends ConsumerState<SignUpDialog> {
         return CustomTextFormField(
           controller: ref.watch(signUpNotifier).fullNameInputController,
           hintText: "lbl_esther_howard".tr,
+          autofillHints: const [AutofillHints.name],
           prefix: Container(
             margin: EdgeInsets.fromLTRB(16.h, 12.h, 10.h, 12.h),
             child: CustomImageView(
@@ -208,6 +209,7 @@ class SignUpDialogState extends ConsumerState<SignUpDialog> {
           controller: ref.watch(signUpNotifier).emailInputController,
           hintText: "msg_user_example_com".tr,
           textInputType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
           prefix: Container(
             margin: EdgeInsets.fromLTRB(16.h, 12.h, 10.h, 12.h),
             child: CustomImageView(
@@ -241,12 +243,12 @@ class SignUpDialogState extends ConsumerState<SignUpDialog> {
           hintText: "lbl".tr,
           textInputAction: TextInputAction.done,
           textInputType: TextInputType.visiblePassword,
+          autofillHints: const [AutofillHints.newPassword],
           prefix: Container(
             margin: EdgeInsets.fromLTRB(16.h, 12.h, 10.h, 12.h),
             child: CustomImageView(
-              imagePath:
-                  ImageConstant
-                      .imgLockpadLocksafesecurityprotectedlockAlt24Outline,
+              imagePath: ImageConstant
+                  .imgLockpadLocksafesecurityprotectedlockAlt24Outline,
               height: 22.h,
               width: 18.h,
               fit: BoxFit.contain,

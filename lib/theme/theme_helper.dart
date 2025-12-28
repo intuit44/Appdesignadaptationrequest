@@ -70,7 +70,7 @@ class ThemeHelper {
       dividerTheme: DividerThemeData(
         thickness: 1,
         space: 1,
-        color: appTheme.gray90001.withOpacity(0.15),
+        color: appTheme.gray90001.withValues(alpha: 0.15),
       ),
     );
   }

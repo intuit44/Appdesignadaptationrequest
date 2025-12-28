@@ -1,3 +1,4 @@
+// ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../core/utils/validation_functions.dart';
@@ -6,7 +7,7 @@ import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'notifier/sign_in_notifier.dart'; // ignore_for_file: must_be_immutable
+import 'notifier/sign_in_notifier.dart';
 
 class SignInDialog extends ConsumerStatefulWidget {
   const SignInDialog({Key? key}) : super(key: key);
@@ -15,7 +16,6 @@ class SignInDialog extends ConsumerStatefulWidget {
   SignInDialogState createState() => SignInDialogState();
 }
 
-// ignore_for_file: must_be_immutable
 class SignInDialogState extends ConsumerState<SignInDialog> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -166,6 +166,7 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
           controller: ref.watch(signInNotifier).emailInputFieldController,
           hintText: "msg_user_example_com".tr,
           textInputType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
           prefix: Container(
             margin: EdgeInsets.fromLTRB(16.h, 12.h, 10.h, 12.h),
             child: CustomImageView(
@@ -199,12 +200,12 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
           hintText: "lbl".tr,
           textInputAction: TextInputAction.done,
           textInputType: TextInputType.visiblePassword,
+          autofillHints: const [AutofillHints.password],
           prefix: Container(
             margin: EdgeInsets.fromLTRB(16.h, 12.h, 10.h, 12.h),
             child: CustomImageView(
-              imagePath:
-                  ImageConstant
-                      .imgLockpadLocksafesecurityprotectedlockAlt24Outline,
+              imagePath: ImageConstant
+                  .imgLockpadLocksafesecurityprotectedlockAlt24Outline,
               height: 22.h,
               width: 18.h,
               fit: BoxFit.contain,

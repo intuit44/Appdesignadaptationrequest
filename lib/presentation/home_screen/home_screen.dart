@@ -77,6 +77,11 @@ class HomeScreenState extends ConsumerState<HomeScreen>
       text: "msg_never_stop_learning".tr,
       buttonStyle: CustomButtonStyles.fillWhiteA,
       buttonTextStyle: CustomTextStyles.titleSmallDeeporange400,
+      onPressed: () {
+        // Template buttons ship without navigation wiring.
+        // Send user to the demo navigation hub.
+        NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+      },
     );
   }
 
@@ -110,6 +115,10 @@ class HomeScreenState extends ConsumerState<HomeScreen>
         ),
       ),
       buttonTextStyle: CustomTextStyles.titleMediumWhiteA700,
+      onPressed: () {
+        // Reasonable default: take user to mentors list (example flow).
+        NavigatorService.pushNamed(AppRoutes.mentorsScreen);
+      },
     );
   }
 
@@ -119,6 +128,9 @@ class HomeScreenState extends ConsumerState<HomeScreen>
       text: "lbl_visit_courses".tr,
       margin: EdgeInsets.only(left: 86.h, right: 72.h),
       buttonTextStyle: CustomTextStyles.titleMediumWhiteA700,
+      onPressed: () {
+        NavigatorService.pushNamed(AppRoutes.eduviCourseDetailsScreen);
+      },
     );
   }
 
@@ -135,14 +147,25 @@ class HomeScreenState extends ConsumerState<HomeScreen>
           title: AppbarTitle(
             text: "lbl_educatsy".tr,
             margin: EdgeInsets.only(left: 8.h),
+            onTap: () {
+              NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+            },
           ),
           actions: [
-            AppbarSubtitle(text: "lbl_menu".tr),
+            AppbarSubtitle(
+              text: "lbl_menu".tr,
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
+            ),
             AppbarTrailingImage(
               imagePath: ImageConstant.imgBars24Outline,
               height: 30.h,
               width: 30.h,
               margin: EdgeInsets.only(left: 11.h, right: 19.h),
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
             ),
           ],
           styleType: Style.bgFill,
@@ -361,7 +384,7 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                       borderRadius: BorderRadiusStyle.roundedBorder10,
                       boxShadow: [
                         BoxShadow(
-                          color: appTheme.black90001.withOpacity(0.05),
+                          color: appTheme.black90001.withValues(alpha: 0.05),
                           spreadRadius: 2.h,
                           blurRadius: 2.h,
                           offset: Offset(0, 50),
@@ -411,7 +434,7 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: appTheme.black90001
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha: 0.1),
                                                       spreadRadius: 2.h,
                                                       blurRadius: 2.h,
                                                       offset: Offset(0, 50),

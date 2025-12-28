@@ -22,7 +22,7 @@ class SignUpNotifier extends StateNotifier<SignUpState> {
   SignUpNotifier(SignUpState state) : super(state);
 
   void changePasswordVisibility() {
-    state = state.copyWith(isShowPassword: !(state.isShowPassword ?? false));
+    state = state.copyWith(isShowPassword: !state.isShowPassword);
   }
 
   void changeCheckBox(bool value) {
