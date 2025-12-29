@@ -5,8 +5,7 @@ import '../models/pricing_one_item_model.dart';
 
 // ignore_for_file: must_be_immutable
 class PricingOneItemWidget extends StatelessWidget {
-  PricingOneItemWidget(this.pricingOneItemModelObj, {Key? key})
-      : super(key: key);
+  PricingOneItemWidget(this.pricingOneItemModelObj, {super.key});
 
   PricingOneItemModel pricingOneItemModelObj;
 
@@ -34,7 +33,7 @@ class PricingOneItemWidget extends StatelessWidget {
             style: CustomTextStyles.titleLargeGray9000120,
           ),
           SizedBox(height: 6.h),
-          SizedBox(width: double.maxFinite, child: Divider()),
+          const SizedBox(width: double.maxFinite, child: Divider()),
           SizedBox(height: 20.h),
           SizedBox(
             width: double.maxFinite,

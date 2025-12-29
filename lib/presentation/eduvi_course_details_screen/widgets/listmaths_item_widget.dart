@@ -4,7 +4,7 @@ import '../models/listmaths_item_model.dart';
 
 // ignore_for_file: must_be_immutable
 class ListmathsItemWidget extends StatelessWidget {
-  ListmathsItemWidget(this.listmathsItemModelObj, {Key? key}) : super(key: key);
+  ListmathsItemWidget(this.listmathsItemModelObj, {super.key});
 
   ListmathsItemModel listmathsItemModelObj;
 

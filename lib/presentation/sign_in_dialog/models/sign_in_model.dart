@@ -3,10 +3,10 @@ import 'package:equatable/equatable.dart';
 /// This class defines the variables used in the [sign_in_dialog],
 /// and is typically used to hold data that is passed between different parts of the application.
 class SignInModel extends Equatable {
-  SignInModel();
+  const SignInModel();
 
   SignInModel copyWith() {
-    return SignInModel();
+    return const SignInModel();
   }
 
   @override

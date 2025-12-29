@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 
 class AppbarTrailingImage extends StatelessWidget {
-  AppbarTrailingImage({
-    Key? key,
+  const AppbarTrailingImage({
+    super.key,
     this.imagePath,
     this.height,
     this.width,
     this.onTap,
     this.margin,
-  }) : super(key: key);
+  });
 
   final double? height;
 

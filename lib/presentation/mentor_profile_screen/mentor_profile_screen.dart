@@ -9,7 +9,7 @@ import '../../widgets/custom_elevated_button.dart';
 import 'scrollview_one_tab5_page.dart';
 
 class MentorProfileScreen extends ConsumerStatefulWidget {
-  const MentorProfileScreen({Key? key}) : super(key: key);
+  const MentorProfileScreen({super.key});
 
   @override
   MentorProfileScreenState createState() => MentorProfileScreenState();
@@ -22,7 +22,7 @@ class MentorProfileScreenState extends ConsumerState<MentorProfileScreen>
 
   int tabIndex = 0;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class MentorProfileScreenState extends ConsumerState<MentorProfileScreen>
                 height: 2474.h,
                 child: TabBarView(
                   controller: tabviewController,
-                  children: [
+                  children: const [
                     ScrollviewOneTab5Page(),
                     ScrollviewOneTab5Page(),
                     ScrollviewOneTab5Page(),
@@ -164,7 +164,7 @@ class MentorProfileScreenState extends ConsumerState<MentorProfileScreen>
                             "lbl_ratings".tr,
                             style: CustomTextStyles.titleMediumSemiBold,
                           ),
-                          Spacer(),
+                          const Spacer(),
                           CustomImageView(
                             imagePath: ImageConstant.imgSignal,
                             height: 14.h,
@@ -237,7 +237,7 @@ class MentorProfileScreenState extends ConsumerState<MentorProfileScreen>
                               style: CustomTextStyles.titleMediumSemiBold,
                             ),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           CustomImageView(
                             imagePath: ImageConstant.imgFacebookGray90001,
                             height: 16.h,

@@ -100,5 +100,5 @@ final eduviOnlineShopNotifier = StateNotifierProvider.autoDispose<
 
 /// A notifier that manages the state of a EduviOnlineShop according to the event that is dispatched to it.
 class EduviOnlineShopNotifier extends StateNotifier<EduviOnlineShopState> {
-  EduviOnlineShopNotifier(EduviOnlineShopState state) : super(state);
+  EduviOnlineShopNotifier(super.state);
 }

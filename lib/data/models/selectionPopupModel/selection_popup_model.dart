@@ -1,5 +1,6 @@
 ///SelectionPopupModel is common model
 ///used for setting data into dropdowns
+library;
 
 // ignore_for_file: must_be_immutable
 class SelectionPopupModel {

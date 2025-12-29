@@ -35,7 +35,7 @@ class CustomButtonStyles {
         elevation: WidgetStateProperty.all<double>(0),
         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.zero),
         side: WidgetStateProperty.all<BorderSide>(
-          BorderSide(color: Colors.transparent),
+          const BorderSide(color: Colors.transparent),
         ),
       );
 }

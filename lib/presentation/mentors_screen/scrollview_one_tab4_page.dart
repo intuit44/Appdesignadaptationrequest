@@ -10,7 +10,7 @@ import 'notifier/mentors_notifier.dart';
 import 'widgets/mentorslist_item_widget.dart';
 
 class ScrollviewOneTab4Page extends ConsumerStatefulWidget {
-  const ScrollviewOneTab4Page({Key? key}) : super(key: key);
+  const ScrollviewOneTab4Page({super.key});
 
   @override
   ScrollviewOneTab4PageState createState() => ScrollviewOneTab4PageState();
@@ -105,7 +105,7 @@ class ScrollviewOneTab4PageState extends ConsumerState<ScrollviewOneTab4Page> {
         builder: (context, ref, _) {
           return ListView.separated(
             padding: EdgeInsets.zero,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             separatorBuilder: (context, index) {
               return SizedBox(height: 18.h);

@@ -45,15 +45,15 @@ class AppRoutes {
   static const String initialRoute = '/initialRoute';
 
   static Map<String, WidgetBuilder> routes = {
-    homeScreen: (context) => HomeScreen(),
-    eduviOnlineShopOneScreen: (context) => EduviOnlineShopOneScreen(),
-    eduviOnlineShopScreen: (context) => EduviOnlineShopScreen(),
-    eduviCourseDetailsScreen: (context) => EduviCourseDetailsScreen(),
-    pricingScreen: (context) => PricingScreen(),
-    becomeAnInstructorScreen: (context) => BecomeAnInstructorScreen(),
-    mentorsScreen: (context) => MentorsScreen(),
-    mentorProfileScreen: (context) => MentorProfileScreen(),
-    appNavigationScreen: (context) => AppNavigationScreen(),
-    initialRoute: (context) => HomeScreen(),
+    homeScreen: (context) => const HomeScreen(),
+    eduviOnlineShopOneScreen: (context) => const EduviOnlineShopOneScreen(),
+    eduviOnlineShopScreen: (context) => const EduviOnlineShopScreen(),
+    eduviCourseDetailsScreen: (context) => const EduviCourseDetailsScreen(),
+    pricingScreen: (context) => const PricingScreen(),
+    becomeAnInstructorScreen: (context) => const BecomeAnInstructorScreen(),
+    mentorsScreen: (context) => const MentorsScreen(),
+    mentorProfileScreen: (context) => const MentorProfileScreen(),
+    appNavigationScreen: (context) => const AppNavigationScreen(),
+    initialRoute: (context) => const HomeScreen(),
   };
 }

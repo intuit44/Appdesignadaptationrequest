@@ -16,7 +16,7 @@ import 'scrollview_one_tab_page.dart';
 import 'widgets/chipviewone_two_item_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   HomeScreenState createState() => HomeScreenState();
@@ -27,7 +27,7 @@ class HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late TabController tabviewController;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -57,8 +57,8 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                   controller: tabviewController,
                   children: [
                     Container(),
-                    ScrollviewOneTabPage(),
-                    ScrollviewOneTabPage(),
+                    const ScrollviewOneTabPage(),
+                    const ScrollviewOneTabPage(),
                   ],
                 ),
               ),
@@ -257,8 +257,8 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                                   borderRadius:
                                       BorderRadiusStyle.customBorderTL58,
                                   gradient: LinearGradient(
-                                    begin: Alignment(0.5, 0.14),
-                                    end: Alignment(0.5, 1),
+                                    begin: const Alignment(0.5, 0.14),
+                                    end: const Alignment(0.5, 1),
                                     colors: [
                                       appTheme.orange20000,
                                       appTheme.orange20001,
@@ -387,7 +387,7 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                           color: appTheme.black90001.withValues(alpha: 0.05),
                           spreadRadius: 2.h,
                           blurRadius: 2.h,
-                          offset: Offset(0, 50),
+                          offset: const Offset(0, 50),
                         ),
                       ],
                     ),
@@ -437,7 +437,7 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                                                           .withValues(alpha: 0.1),
                                                       spreadRadius: 2.h,
                                                       blurRadius: 2.h,
-                                                      offset: Offset(0, 50),
+                                                      offset: const Offset(0, 50),
                                                     ),
                                                   ],
                                                 ),

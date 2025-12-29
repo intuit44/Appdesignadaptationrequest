@@ -13,7 +13,7 @@ import 'notifier/pricing_notifier.dart';
 import 'widgets/pricing_one_item_widget.dart';
 
 class PricingScreen extends ConsumerStatefulWidget {
-  const PricingScreen({Key? key}) : super(key: key);
+  const PricingScreen({super.key});
 
   @override
   PricingScreenState createState() => PricingScreenState();
@@ -21,7 +21,7 @@ class PricingScreen extends ConsumerStatefulWidget {
 
 // ignore_for_file: must_be_immutable
 class PricingScreenState extends ConsumerState<PricingScreen> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +168,7 @@ class PricingScreenState extends ConsumerState<PricingScreen> {
             builder: (context, ref, _) {
               return ListView.separated(
                 padding: EdgeInsets.zero,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 separatorBuilder: (context, index) {
                   return SizedBox(height: 20.h);

@@ -10,11 +10,13 @@ void main() {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
     PrefUtils().init(),
   ]).then((value) {
-    runApp(ProviderScope(child: MyApp()));
+    runApp(const ProviderScope(child: MyApp()));
   });
 }
 
 class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(themeNotifier);
@@ -27,19 +29,19 @@ class MyApp extends ConsumerWidget {
             return MediaQuery(
               data: MediaQuery.of(
                 context,
-              ).copyWith(textScaler: TextScaler.linear(1.0)),
+              ).copyWith(textScaler: const TextScaler.linear(1.0)),
               child: child!,
             );
           },
           navigatorKey: NavigatorService.navigatorKey,
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizationDelegate(),
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: [Locale('en', '')],
+          supportedLocales: const [Locale('en', '')],
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.routes,
         );

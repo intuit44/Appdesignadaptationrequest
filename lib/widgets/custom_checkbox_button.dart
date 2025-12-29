@@ -4,7 +4,7 @@ import '../core/app_export.dart';
 // ignore_for_file: must_be_immutable
 class CustomCheckboxButton extends StatelessWidget {
   CustomCheckboxButton({
-    Key? key,
+    super.key,
     required this.onChange,
     this.decoration,
     this.alignment,
@@ -18,7 +18,7 @@ class CustomCheckboxButton extends StatelessWidget {
     this.overflow,
     this.textAlignment,
     this.isExpandedText = false,
-  }) : super(key: key);
+  });
 
   final BoxDecoration? decoration;
 
@@ -94,7 +94,7 @@ class CustomCheckboxButton extends StatelessWidget {
     height: iconSize,
     width: iconSize,
     child: Checkbox(
-      visualDensity: VisualDensity(vertical: -4, horizontal: -4),
+      visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
       value: value ?? false,
       onChanged: (value) {
         onChange(value!);

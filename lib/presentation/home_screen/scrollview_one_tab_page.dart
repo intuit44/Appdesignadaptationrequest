@@ -10,7 +10,7 @@ import 'notifier/home_notifier.dart';
 import 'widgets/classlist_item_widget.dart';
 
 class ScrollviewOneTabPage extends ConsumerStatefulWidget {
-  const ScrollviewOneTabPage({Key? key}) : super(key: key);
+  const ScrollviewOneTabPage({super.key});
 
   @override
   ScrollviewOneTabPageState createState() => ScrollviewOneTabPageState();
@@ -83,7 +83,7 @@ class ScrollviewOneTabPageState extends ConsumerState<ScrollviewOneTabPage> {
         builder: (context, ref, _) {
           return ListView.separated(
             padding: EdgeInsets.zero,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             separatorBuilder: (context, index) {
               return SizedBox(height: 14.h);

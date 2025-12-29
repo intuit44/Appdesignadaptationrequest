@@ -3,31 +3,21 @@ import '../core/app_export.dart';
 import 'base_button.dart';
 
 class CustomElevatedButton extends BaseButton {
-  CustomElevatedButton({
-    Key? key,
+  const CustomElevatedButton({
+    super.key,
     this.decoration,
     this.leftIcon,
     this.rightIcon,
-    EdgeInsets? margin,
-    VoidCallback? onPressed,
-    ButtonStyle? buttonStyle,
-    Alignment? alignment,
-    TextStyle? buttonTextStyle,
-    bool? isDisabled,
-    double? height,
-    double? width,
-    required String text,
-  }) : super(
-         text: text,
-         onPressed: onPressed,
-         buttonStyle: buttonStyle,
-         isDisabled: isDisabled,
-         buttonTextStyle: buttonTextStyle,
-         height: height,
-         width: width,
-         alignment: alignment,
-         margin: margin,
-       );
+    super.margin,
+    super.onPressed,
+    super.buttonStyle,
+    super.alignment,
+    super.buttonTextStyle,
+    super.isDisabled,
+    super.height,
+    super.width,
+    required super.text,
+  });
 
   final BoxDecoration? decoration;
 
@@ -39,32 +29,32 @@ class CustomElevatedButton extends BaseButton {
   Widget build(BuildContext context) {
     return alignment != null
         ? Align(
-          alignment: alignment ?? Alignment.center,
-          child: buildElevatedButtonWidget,
-        )
+            alignment: alignment ?? Alignment.center,
+            child: buildElevatedButtonWidget,
+          )
         : buildElevatedButtonWidget;
   }
 
   Widget get buildElevatedButtonWidget => Container(
-    height: this.height ?? 50.h,
-    width: this.width ?? double.maxFinite,
-    margin: margin,
-    decoration: decoration,
-    child: ElevatedButton(
-      style: buttonStyle,
-      onPressed: isDisabled ?? false ? null : onPressed ?? () {},
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          leftIcon ?? const SizedBox.shrink(),
-          Text(
-            text,
-            style: buttonTextStyle ?? CustomTextStyles.titleMediumPrimary,
+        height: height ?? 50.h,
+        width: width ?? double.maxFinite,
+        margin: margin,
+        decoration: decoration,
+        child: ElevatedButton(
+          style: buttonStyle,
+          onPressed: isDisabled ?? false ? null : onPressed ?? () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              leftIcon ?? const SizedBox.shrink(),
+              Text(
+                text,
+                style: buttonTextStyle ?? CustomTextStyles.titleMediumPrimary,
+              ),
+              rightIcon ?? const SizedBox.shrink(),
+            ],
           ),
-          rightIcon ?? const SizedBox.shrink(),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }

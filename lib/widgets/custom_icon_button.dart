@@ -10,7 +10,7 @@ extension IconButtonStyleHelper on CustomIconButton {
         color: appTheme.gray90001.withValues(alpha: 0.15),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 25),
+        offset: const Offset(0, 25),
       ),
     ],
   );
@@ -22,7 +22,7 @@ extension IconButtonStyleHelper on CustomIconButton {
         color: appTheme.gray90001.withValues(alpha: 0.15),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 25),
+        offset: const Offset(0, 25),
       ),
     ],
   );
@@ -38,12 +38,12 @@ extension IconButtonStyleHelper on CustomIconButton {
     color: theme.colorScheme.primary,
     borderRadius: BorderRadius.circular(20.h),
   );
-  static BoxDecoration get none => BoxDecoration();
+  static BoxDecoration get none => const BoxDecoration();
 }
 
 class CustomIconButton extends StatelessWidget {
-  CustomIconButton({
-    Key? key,
+  const CustomIconButton({
+    super.key,
     this.alignment,
     this.height,
     this.width,
@@ -51,7 +51,7 @@ class CustomIconButton extends StatelessWidget {
     this.padding,
     this.onTap,
     this.child,
-  }) : super(key: key);
+  });
 
   final Alignment? alignment;
 

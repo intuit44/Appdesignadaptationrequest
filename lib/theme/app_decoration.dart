@@ -19,8 +19,8 @@ class AppDecoration {
   // Gradient decorations
   static BoxDecoration get gradientOrangeToOrange => BoxDecoration(
     gradient: LinearGradient(
-      begin: Alignment(0.5, 0.14),
-      end: Alignment(0.5, 1),
+      begin: const Alignment(0.5, 0.14),
+      end: const Alignment(0.5, 1),
       colors: [appTheme.orange20000, appTheme.orange20001],
     ),
   );
@@ -32,7 +32,7 @@ class AppDecoration {
         color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 50),
+        offset: const Offset(0, 50),
       ),
     ],
   );
@@ -43,7 +43,7 @@ class AppDecoration {
         color: appTheme.black90001.withValues(alpha: 0.1),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 50),
+        offset: const Offset(0, 50),
       ),
     ],
   );
@@ -54,7 +54,7 @@ class AppDecoration {
         color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 50),
+        offset: const Offset(0, 50),
       ),
     ],
   );
@@ -65,7 +65,7 @@ class AppDecoration {
         color: appTheme.black90001.withValues(alpha: 0.1),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 50),
+        offset: const Offset(0, 50),
       ),
     ],
   );
@@ -76,7 +76,7 @@ class AppDecoration {
         color: appTheme.black90001.withValues(alpha: 0.05),
         spreadRadius: 2.h,
         blurRadius: 2.h,
-        offset: Offset(0, 50),
+        offset: const Offset(0, 50),
       ),
     ],
   );

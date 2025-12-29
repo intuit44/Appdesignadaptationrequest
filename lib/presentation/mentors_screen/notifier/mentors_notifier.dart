@@ -37,5 +37,5 @@ final mentorsNotifier =
 
 /// A notifier that manages the state of a Mentors according to the event that is dispatched to it.
 class MentorsNotifier extends StateNotifier<MentorsState> {
-  MentorsNotifier(MentorsState state) : super(state);
+  MentorsNotifier(super.state);
 }

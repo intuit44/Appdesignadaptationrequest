@@ -8,7 +8,7 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import 'scrollview_one_tab3_page.dart';
 
 class BecomeAnInstructorScreen extends ConsumerStatefulWidget {
-  const BecomeAnInstructorScreen({Key? key}) : super(key: key);
+  const BecomeAnInstructorScreen({super.key});
 
   @override
   BecomeAnInstructorScreenState createState() =>
@@ -21,7 +21,7 @@ class BecomeAnInstructorScreenState
     with TickerProviderStateMixin {
   late TabController tabviewController;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class BecomeAnInstructorScreenState
                 height: 2446.h,
                 child: TabBarView(
                   controller: tabviewController,
-                  children: [ScrollviewOneTab3Page(), ScrollviewOneTab3Page()],
+                  children: const [ScrollviewOneTab3Page(), ScrollviewOneTab3Page()],
                 ),
               ),
             ),

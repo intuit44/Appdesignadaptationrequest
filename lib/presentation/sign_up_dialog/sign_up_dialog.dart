@@ -9,7 +9,7 @@ import '../../widgets/custom_text_form_field.dart';
 import 'notifier/sign_up_notifier.dart';
 
 class SignUpDialog extends ConsumerStatefulWidget {
-  const SignUpDialog({Key? key}) : super(key: key);
+  const SignUpDialog({super.key});
 
   @override
   SignUpDialogState createState() => SignUpDialogState();
@@ -17,7 +17,7 @@ class SignUpDialog extends ConsumerStatefulWidget {
 
 // ignore_for_file: must_be_immutable
 class SignUpDialogState extends ConsumerState<SignUpDialog> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {

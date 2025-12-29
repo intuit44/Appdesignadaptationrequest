@@ -6,9 +6,9 @@ import '../models/chipviewone_two_item_model.dart';
 class ChipviewoneTwoItemWidget extends StatelessWidget {
   ChipviewoneTwoItemWidget(
     this.chipviewoneTwoItemModelObj, {
-    Key? key,
+    super.key,
     this.onSelectedChipView,
-  }) : super(key: key);
+  });
 
   ChipviewoneTwoItemModel chipviewoneTwoItemModelObj;
 

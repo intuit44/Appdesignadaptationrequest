@@ -19,7 +19,7 @@ final signUpNotifier =
 
 /// A notifier that manages the state of a SignUp according to the event that is dispatched to it.
 class SignUpNotifier extends StateNotifier<SignUpState> {
-  SignUpNotifier(SignUpState state) : super(state);
+  SignUpNotifier(super.state);
 
   void changePasswordVisibility() {
     state = state.copyWith(isShowPassword: !state.isShowPassword);

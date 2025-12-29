@@ -12,7 +12,7 @@ import 'widgets/listthethree_item_widget.dart';
 import 'widgets/standardslist_item_widget.dart';
 
 class ScrollviewOneTab2Page extends ConsumerStatefulWidget {
-  const ScrollviewOneTab2Page({Key? key}) : super(key: key);
+  const ScrollviewOneTab2Page({super.key});
 
   @override
   ScrollviewOneTab2PageState createState() => ScrollviewOneTab2PageState();
@@ -57,7 +57,7 @@ class ScrollviewOneTab2PageState extends ConsumerState<ScrollviewOneTab2Page> {
         builder: (context, ref, _) {
           return ListView.separated(
             padding: EdgeInsets.zero,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             separatorBuilder: (context, index) {
               return SizedBox(height: 14.h);
@@ -132,7 +132,7 @@ class ScrollviewOneTab2PageState extends ConsumerState<ScrollviewOneTab2Page> {
             builder: (context, ref, _) {
               return ListView.separated(
                 padding: EdgeInsets.zero,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 separatorBuilder: (context, index) {
                   return SizedBox(height: 10.h);

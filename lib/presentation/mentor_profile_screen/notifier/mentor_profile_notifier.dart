@@ -12,12 +12,12 @@ final mentorProfileNotifier = StateNotifierProvider.autoDispose<
   (ref) => MentorProfileNotifier(
     MentorProfileState(
       emailController: TextEditingController(),
-      scrollviewOneTab5ModelObj: ScrollviewOneTab5Model(),
+      scrollviewOneTab5ModelObj: const ScrollviewOneTab5Model(),
     ),
   ),
 );
 
 /// A notifier that manages the state of a MentorProfile according to the event that is dispatched to it.
 class MentorProfileNotifier extends StateNotifier<MentorProfileState> {
-  MentorProfileNotifier(MentorProfileState state) : super(state);
+  MentorProfileNotifier(super.state);
 }

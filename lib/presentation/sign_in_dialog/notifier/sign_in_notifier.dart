@@ -18,7 +18,7 @@ final signInNotifier =
 
 /// A notifier that manages the state of a SignIn according to the event that is dispatched to it.
 class SignInNotifier extends StateNotifier<SignInState> {
-  SignInNotifier(SignInState state) : super(state);
+  SignInNotifier(super.state);
 
   void changePasswordVisibility() {
     state = state.copyWith(isShowPassword: !state.isShowPassword);

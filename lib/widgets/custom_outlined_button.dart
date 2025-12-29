@@ -3,32 +3,22 @@ import '../core/app_export.dart';
 import 'base_button.dart';
 
 class CustomOutlinedButton extends BaseButton {
-  CustomOutlinedButton({
-    Key? key,
+  const CustomOutlinedButton({
+    super.key,
     this.decoration,
     this.leftIcon,
     this.rightIcon,
     this.label,
-    VoidCallback? onPressed,
-    ButtonStyle? buttonStyle,
-    TextStyle? buttonTextStyle,
-    bool? isDisabled,
-    Alignment? alignment,
-    double? height,
-    double? width,
-    EdgeInsets? margin,
-    required String text,
-  }) : super(
-         text: text,
-         onPressed: onPressed,
-         buttonStyle: buttonStyle,
-         isDisabled: isDisabled,
-         buttonTextStyle: buttonTextStyle,
-         height: height,
-         alignment: alignment,
-         width: width,
-         margin: margin,
-       );
+    super.onPressed,
+    super.buttonStyle,
+    super.buttonTextStyle,
+    super.isDisabled,
+    super.alignment,
+    super.height,
+    super.width,
+    super.margin,
+    required super.text,
+  });
 
   final BoxDecoration? decoration;
 
@@ -42,32 +32,32 @@ class CustomOutlinedButton extends BaseButton {
   Widget build(BuildContext context) {
     return alignment != null
         ? Align(
-          alignment: alignment ?? Alignment.center,
-          child: buildOutlinedButtonWidget,
-        )
+            alignment: alignment ?? Alignment.center,
+            child: buildOutlinedButtonWidget,
+          )
         : buildOutlinedButtonWidget;
   }
 
   Widget get buildOutlinedButtonWidget => Container(
-    height: this.height ?? 50.h,
-    width: this.width ?? double.maxFinite,
-    margin: margin,
-    decoration: decoration,
-    child: OutlinedButton(
-      style: buttonStyle,
-      onPressed: isDisabled ?? false ? null : onPressed ?? () {},
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          leftIcon ?? const SizedBox.shrink(),
-          Text(
-            text,
-            style: buttonTextStyle ?? CustomTextStyles.titleMediumPrimary,
+        height: height ?? 50.h,
+        width: width ?? double.maxFinite,
+        margin: margin,
+        decoration: decoration,
+        child: OutlinedButton(
+          style: buttonStyle,
+          onPressed: isDisabled ?? false ? null : onPressed ?? () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              leftIcon ?? const SizedBox.shrink(),
+              Text(
+                text,
+                style: buttonTextStyle ?? CustomTextStyles.titleMediumPrimary,
+              ),
+              rightIcon ?? const SizedBox.shrink(),
+            ],
           ),
-          rightIcon ?? const SizedBox.shrink(),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }

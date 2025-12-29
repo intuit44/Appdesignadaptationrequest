@@ -12,7 +12,7 @@ final becomeAnInstructorNotifier = StateNotifierProvider.autoDispose<
   (ref) => BecomeAnInstructorNotifier(
     BecomeAnInstructorState(
       emailController: TextEditingController(),
-      scrollviewOneTab3ModelObj: ScrollviewOneTab3Model(),
+      scrollviewOneTab3ModelObj: const ScrollviewOneTab3Model(),
     ),
   ),
 );
@@ -20,5 +20,5 @@ final becomeAnInstructorNotifier = StateNotifierProvider.autoDispose<
 /// A notifier that manages the state of a BecomeAnInstructor according to the event that is dispatched to it.
 class BecomeAnInstructorNotifier
     extends StateNotifier<BecomeAnInstructorState> {
-  BecomeAnInstructorNotifier(BecomeAnInstructorState state) : super(state);
+  BecomeAnInstructorNotifier(super.state);
 }

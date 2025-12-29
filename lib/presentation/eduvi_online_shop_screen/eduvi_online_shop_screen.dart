@@ -8,7 +8,7 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import 'scrollview_one_tab2_page.dart';
 
 class EduviOnlineShopScreen extends ConsumerStatefulWidget {
-  const EduviOnlineShopScreen({Key? key}) : super(key: key);
+  const EduviOnlineShopScreen({super.key});
 
   @override
   EduviOnlineShopScreenState createState() => EduviOnlineShopScreenState();
@@ -21,7 +21,7 @@ class EduviOnlineShopScreenState extends ConsumerState<EduviOnlineShopScreen>
 
   int tabIndex = 0;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -51,8 +51,8 @@ class EduviOnlineShopScreenState extends ConsumerState<EduviOnlineShopScreen>
                   controller: tabviewController,
                   children: [
                     Container(),
-                    ScrollviewOneTab2Page(),
-                    ScrollviewOneTab2Page(),
+                    const ScrollviewOneTab2Page(),
+                    const ScrollviewOneTab2Page(),
                   ],
                 ),
               ),

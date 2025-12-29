@@ -45,5 +45,5 @@ final eduviCourseDetailsNotifier = StateNotifierProvider.autoDispose<
 /// A notifier that manages the state of a EduviCourseDetails according to the event that is dispatched to it.
 class EduviCourseDetailsNotifier
     extends StateNotifier<EduviCourseDetailsState> {
-  EduviCourseDetailsNotifier(EduviCourseDetailsState state) : super(state);
+  EduviCourseDetailsNotifier(super.state);
 }

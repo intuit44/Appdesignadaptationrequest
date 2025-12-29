@@ -8,7 +8,7 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import 'scrollview_one_tab4_page.dart';
 
 class MentorsScreen extends ConsumerStatefulWidget {
-  const MentorsScreen({Key? key}) : super(key: key);
+  const MentorsScreen({super.key});
 
   @override
   MentorsScreenState createState() => MentorsScreenState();
@@ -21,7 +21,7 @@ class MentorsScreenState extends ConsumerState<MentorsScreen>
 
   int tabIndex = 0;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class MentorsScreenState extends ConsumerState<MentorsScreen>
                 height: 3408.h,
                 child: TabBarView(
                   controller: tabviewController,
-                  children: [
+                  children: const [
                     ScrollviewOneTab4Page(),
                     ScrollviewOneTab4Page(),
                     ScrollviewOneTab4Page(),

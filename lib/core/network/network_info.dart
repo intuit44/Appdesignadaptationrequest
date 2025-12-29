@@ -21,7 +21,7 @@ class NetworkInfo implements NetworkInfoI {
   }
 
   NetworkInfo._internal(this.connectivity) {
-    connectivity = this.connectivity;
+    connectivity = connectivity;
   }
 
   ///checks internet is connected or not
@@ -73,7 +73,7 @@ class NoInternetException implements Exception {
         SnackBar(content: Text(message)),
       );
     }
-    this._message = message;
+    _message = message;
   }
 
   @override

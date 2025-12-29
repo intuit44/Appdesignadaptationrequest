@@ -5,8 +5,7 @@ import '../models/standardslist_item_model.dart';
 
 // ignore_for_file: must_be_immutable
 class StandardslistItemWidget extends StatelessWidget {
-  StandardslistItemWidget(this.standardslistItemModelObj, {Key? key})
-      : super(key: key);
+  StandardslistItemWidget(this.standardslistItemModelObj, {super.key});
 
   StandardslistItemModel standardslistItemModelObj;
 

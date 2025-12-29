@@ -53,5 +53,5 @@ final pricingNotifier =
 
 /// A notifier that manages the state of a Pricing according to the event that is dispatched to it.
 class PricingNotifier extends StateNotifier<PricingState> {
-  PricingNotifier(PricingState state) : super(state);
+  PricingNotifier(super.state);
 }

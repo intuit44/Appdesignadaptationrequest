@@ -7,7 +7,7 @@ import '../../widgets/custom_text_form_field.dart';
 import 'notifier/become_an_instructor_notifier.dart';
 
 class ScrollviewOneTab3Page extends ConsumerStatefulWidget {
-  const ScrollviewOneTab3Page({Key? key}) : super(key: key);
+  const ScrollviewOneTab3Page({super.key});
 
   @override
   ScrollviewOneTab3PageState createState() => ScrollviewOneTab3PageState();
@@ -185,7 +185,7 @@ class ScrollviewOneTab3PageState extends ConsumerState<ScrollviewOneTab3Page> {
                   color: appTheme.black90001.withValues(alpha: 0.05),
                   spreadRadius: 2.h,
                   blurRadius: 2.h,
-                  offset: Offset(0, 50),
+                  offset: const Offset(0, 50),
                 ),
               ],
             ),
@@ -213,7 +213,7 @@ class ScrollviewOneTab3PageState extends ConsumerState<ScrollviewOneTab3Page> {
                             color: appTheme.black90001.withValues(alpha: 0.05),
                             spreadRadius: 2.h,
                             blurRadius: 2.h,
-                            offset: Offset(0, 50),
+                            offset: const Offset(0, 50),
                           ),
                         ],
                       ),

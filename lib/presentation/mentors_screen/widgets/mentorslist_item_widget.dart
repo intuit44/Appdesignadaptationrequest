@@ -4,8 +4,7 @@ import '../models/mentorslist_item_model.dart';
 
 // ignore_for_file: must_be_immutable
 class MentorslistItemWidget extends StatelessWidget {
-  MentorslistItemWidget(this.mentorslistItemModelObj, {Key? key})
-    : super(key: key);
+  MentorslistItemWidget(this.mentorslistItemModelObj, {super.key});
 
   MentorslistItemModel mentorslistItemModelObj;
 

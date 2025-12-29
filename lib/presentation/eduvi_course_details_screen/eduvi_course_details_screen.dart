@@ -16,7 +16,7 @@ import 'widgets/listmaths_item_widget.dart';
 import 'widgets/listthethree1_item_widget.dart';
 
 class EduviCourseDetailsScreen extends ConsumerStatefulWidget {
-  const EduviCourseDetailsScreen({Key? key}) : super(key: key);
+  const EduviCourseDetailsScreen({super.key});
 
   @override
   EduviCourseDetailsScreenState createState() =>
@@ -26,7 +26,7 @@ class EduviCourseDetailsScreen extends ConsumerStatefulWidget {
 // ignore_for_file: must_be_immutable
 class EduviCourseDetailsScreenState
     extends ConsumerState<EduviCourseDetailsScreen> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +167,7 @@ class EduviCourseDetailsScreenState
             builder: (context, ref, _) {
               return ListView.separated(
                 padding: EdgeInsets.zero,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 separatorBuilder: (context, index) {
                   return SizedBox(height: 10.h);
@@ -510,7 +510,7 @@ class EduviCourseDetailsScreenState
             builder: (context, ref, _) {
               return ListView.separated(
                 padding: EdgeInsets.zero,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 separatorBuilder: (context, index) {
                   return SizedBox(height: 10.h);

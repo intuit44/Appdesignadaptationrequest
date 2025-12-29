@@ -5,7 +5,7 @@ import '../models/classlist_item_model.dart';
 
 // ignore_for_file: must_be_immutable
 class ClasslistItemWidget extends StatelessWidget {
-  ClasslistItemWidget(this.classlistItemModelObj, {Key? key}) : super(key: key);
+  ClasslistItemWidget(this.classlistItemModelObj, {super.key});
 
   ClasslistItemModel classlistItemModelObj;
 

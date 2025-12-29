@@ -1,4 +1,5 @@
 /// This class is used in the [listthethree1_item_widget] screen.
+library;
 
 // ignore_for_file: must_be_immutable
 class Listthethree1ItemModel {

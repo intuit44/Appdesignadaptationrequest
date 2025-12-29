@@ -6,7 +6,7 @@ import '../../widgets/custom_text_form_field.dart';
 import 'notifier/mentor_profile_notifier.dart';
 
 class ScrollviewOneTab5Page extends ConsumerStatefulWidget {
-  const ScrollviewOneTab5Page({Key? key}) : super(key: key);
+  const ScrollviewOneTab5Page({super.key});
 
   @override
   ScrollviewOneTab5PageState createState() => ScrollviewOneTab5PageState();

@@ -10,14 +10,14 @@ import '../../widgets/custom_text_form_field.dart';
 import 'notifier/sign_in_notifier.dart';
 
 class SignInDialog extends ConsumerStatefulWidget {
-  const SignInDialog({Key? key}) : super(key: key);
+  const SignInDialog({super.key});
 
   @override
   SignInDialogState createState() => SignInDialogState();
 }
 
 class SignInDialogState extends ConsumerState<SignInDialog> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
