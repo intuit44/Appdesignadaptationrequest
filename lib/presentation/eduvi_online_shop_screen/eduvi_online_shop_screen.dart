@@ -78,12 +78,20 @@ class EduviOnlineShopScreenState extends ConsumerState<EduviOnlineShopScreen>
             margin: EdgeInsets.only(left: 8.h),
           ),
           actions: [
-            AppbarSubtitle(text: "lbl_menu".tr),
+            AppbarSubtitle(
+              text: "lbl_menu".tr,
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
+            ),
             AppbarTrailingImage(
               imagePath: ImageConstant.imgBars24Outline,
               height: 30.h,
               width: 30.h,
               margin: EdgeInsets.only(left: 11.h, right: 19.h),
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
             ),
           ],
           styleType: Style.bgFill,

@@ -49,7 +49,10 @@ class BecomeAnInstructorScreenState
                 height: 2446.h,
                 child: TabBarView(
                   controller: tabviewController,
-                  children: const [ScrollviewOneTab3Page(), ScrollviewOneTab3Page()],
+                  children: const [
+                    ScrollviewOneTab3Page(),
+                    ScrollviewOneTab3Page()
+                  ],
                 ),
               ),
             ),
@@ -75,12 +78,20 @@ class BecomeAnInstructorScreenState
             margin: EdgeInsets.only(left: 8.h),
           ),
           actions: [
-            AppbarSubtitle(text: "lbl_menu".tr),
+            AppbarSubtitle(
+              text: "lbl_menu".tr,
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
+            ),
             AppbarTrailingImage(
               imagePath: ImageConstant.imgBars24Outline,
               height: 30.h,
               width: 30.h,
               margin: EdgeInsets.only(left: 11.h, right: 19.h),
+              onTap: () {
+                NavigatorService.pushNamed(AppRoutes.appNavigationScreen);
+              },
             ),
           ],
         ),

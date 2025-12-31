@@ -55,10 +55,10 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                 height: 6318.h,
                 child: TabBarView(
                   controller: tabviewController,
-                  children: [
-                    Container(),
-                    const ScrollviewOneTabPage(),
-                    const ScrollviewOneTabPage(),
+                  children: const [
+                    ScrollviewOneTabPage(),
+                    ScrollviewOneTabPage(),
+                    ScrollviewOneTabPage(),
                   ],
                 ),
               ),
@@ -434,10 +434,12 @@ class HomeScreenState extends ConsumerState<HomeScreen>
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: appTheme.black90001
-                                                          .withValues(alpha: 0.1),
+                                                          .withValues(
+                                                              alpha: 0.1),
                                                       spreadRadius: 2.h,
                                                       blurRadius: 2.h,
-                                                      offset: const Offset(0, 50),
+                                                      offset:
+                                                          const Offset(0, 50),
                                                     ),
                                                   ],
                                                 ),

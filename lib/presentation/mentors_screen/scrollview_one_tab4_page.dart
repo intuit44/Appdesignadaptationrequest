@@ -229,13 +229,17 @@ class ScrollviewOneTab4PageState extends ConsumerState<ScrollviewOneTab4Page> {
                   height: 30.h,
                   width: 30.h,
                 ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 12.h),
-                    child: Text(
-                      "lbl_educatsy".tr,
-                      style: theme.textTheme.headlineLarge,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 12.h),
+                      child: Text(
+                        "lbl_educatsy".tr,
+                        style: theme.textTheme.headlineLarge,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                   ),
                 ),
