@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../core/utils/validation_functions.dart';
+import '../../core/providers/auth_state_provider.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_checkbox_button.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -21,6 +22,28 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // Escuchar cambios en el estado de autenticación
+    ref.watch(authStateProvider);
+
+    // Mostrar error si existe
+    ref.listen<GlobalAuthState>(authStateProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+        ref.read(authStateProvider.notifier).clearError();
+      }
+
+      // Si se autenticó exitosamente, cerrar el diálogo y navegar
+      if (next.isAuthenticated && previous?.isAuthenticated != true) {
+        Navigator.of(context).pop();
+        NavigatorService.pushNamedAndRemoveUntil(AppRoutes.homeScreen);
+      }
+    });
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -137,8 +160,11 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
 
   /// Section Widget
   Widget _buildSignupWithGoogleButton(BuildContext context) {
+    final isLoading = ref.watch(authStateProvider).isLoading;
+
     return CustomOutlinedButton(
-      text: "msg_signup_with_google".tr,
+      text: isLoading ? "msg_signing_in".tr : "msg_signup_with_google".tr,
+      onPressed: isLoading ? null : () => _handleGoogleSignIn(),
       leftIcon: Container(
         padding: EdgeInsets.all(8.h),
         margin: EdgeInsets.only(right: 14.h),
@@ -146,16 +172,29 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
           color: appTheme.red60002,
           borderRadius: BorderRadius.circular(6.h),
         ),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgGoogleplus11,
-          height: 24.h,
-          width: 24.h,
-          fit: BoxFit.contain,
-        ),
+        child: isLoading
+            ? SizedBox(
+                height: 24.h,
+                width: 24.h,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : CustomImageView(
+                imagePath: ImageConstant.imgGoogleplus11,
+                height: 24.h,
+                width: 24.h,
+                fit: BoxFit.contain,
+              ),
       ),
       buttonStyle: CustomButtonStyles.outlineGray,
       buttonTextStyle: theme.textTheme.bodyLarge!,
     );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    await ref.read(authStateProvider.notifier).signInWithGoogle();
   }
 
   /// Section Widget
@@ -244,10 +283,26 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
 
   /// Section Widget
   Widget _buildSignUpButton(BuildContext context) {
+    final isLoading = ref.watch(authStateProvider).isLoading;
+
     return CustomElevatedButton(
-      text: "lbl_sign_up".tr,
+      text: isLoading ? "msg_signing_in".tr : "lbl_sign_in".tr,
       buttonTextStyle: CustomTextStyles.titleMediumWhiteA700,
+      onPressed: isLoading ? null : () => _handleEmailSignIn(),
     );
+  }
+
+  Future<void> _handleEmailSignIn() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final signInState = ref.read(signInNotifier);
+      final email = signInState.emailInputFieldController?.text ?? '';
+      final password = signInState.passwordInputFieldController?.text ?? '';
+
+      await ref.read(authStateProvider.notifier).signInWithEmail(
+            email: email,
+            password: password,
+          );
+    }
   }
 
   /// Section Widget

@@ -52,7 +52,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size(SizeUtils.width, height ?? 50.h);
-  _getStyle() {
+
+  Container? _getStyle() {
     switch (styleType) {
       case Style.bgFill:
         return Container(

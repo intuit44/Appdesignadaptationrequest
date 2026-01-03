@@ -30,22 +30,23 @@ class NetworkInfo implements NetworkInfoI {
   @override
   Future<bool> isConnected() async {
     final result = await connectivity.checkConnectivity();
-    if (result != ConnectivityResult.none) {
-      return true;
+    if (result.contains(ConnectivityResult.none)) {
+      return false;
     }
-    return false;
+    return true;
   }
 
   // to check type of internet connectivity
   @override
   Future<ConnectivityResult> get connectivityResult async {
-    return connectivity.checkConnectivity();
+    final results = await connectivity.checkConnectivity();
+    return results.first;
   }
 
   //check the type on internet connection on changed of internet connection
   @override
   Stream<ConnectivityResult> get onConnectivityChanged =>
-      connectivity.onConnectivityChanged;
+      connectivity.onConnectivityChanged.map((event) => event.first);
 }
 
 abstract class Failure {}

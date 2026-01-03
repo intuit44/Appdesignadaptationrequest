@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "413116602762",
+    "project_id": "eng-gate-453810-h3",
+    "storage_bucket": "eng-gate-453810-h3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413116602762:android:18ff9d63b2fab89b701073",
+        "android_client_info": {
+          "package_name": "com.fibroskinbeautyacademy.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "413116602762-7693pg4s0lg2lbqcru1nfguh8i673hup.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmYWTsbup48pcQy3_7fqqUkiXY93cMhSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "413116602762-7693pg4s0lg2lbqcru1nfguh8i673hup.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

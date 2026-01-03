@@ -1,12 +1,14 @@
 
 # fibroskin-beauty-academy
-### Table of contents
+
+## Table of contents
+
 - [System requirements](#system-requirements)
-- [Figma design guidelines for better UI accuracy](#figma-design-guideline-for-better-accuracy)
-- [Check the UI of the entire app](#app-navigations)
-- [Application structure](#project-structure)
-- [How to format your code?](#how-you-can-do-code-formatting)
-- [How you can improve code readability?](#how-you-can-improve-the-readability-of-code)
+- [Figma design guidelines for better UI accuracy](#figma-design-guidelines-for-better-ui-accuracy)
+- [Check the UI of the entire app](#check-the-ui-of-the-entire-app)
+- [Application structure](#application structure)
+- [How to format your code?](#how to format your code)
+- [How you can improve code readability?(#how-you-can-improve-the-readability-of-code)
 - [Libraries and tools used](#libraries-and-tools-used)
 - [Support](#support)
 
@@ -18,7 +20,7 @@ Flutter SDK Version 3.19.4 or greater.
 ### Figma design guidelines for better UI accuracy
 
 Read our guidelines to increase the accuracy of design-to-code conversion by optimizing Figma designs.
-https://docs.dhiwise.com/docs/Designguidelines/intro
+<https://docs.dhiwise.com/docs/Designguidelines/intro>
 
 ### Check the UI of the entire app
 
@@ -28,7 +30,7 @@ Check the UI of all the app screens from a single place by setting up the 'initi
 
 After successful build, your application structure should look like this:
 
-```
+```json
 .
 ├── android                         - It contains files required to run the application on an Android platform.
 ├── assets                          - It contains all images and fonts of your application.
@@ -48,7 +50,8 @@ After successful build, your application structure should look like this:
 ### How to format your code?
 
 - if your code is not formatted then run following command in your terminal to format code
-  ```
+
+  ```bash
   dart format .
   ```
 
@@ -59,10 +62,10 @@ Resolve the errors and warnings that are shown in the application.
 ### Libraries and tools used
 
 - Riverpod - State management
-  https://riverpod.dev/docs/getting_started
+  <https://riverpod.dev/docs/getting_started>
 - cached_network_image - For storing internet image into cache
-  https://pub.dev/packages/cached_network_image
+  <https://pub.dev/packages/cached_network_image>
 
 ### Support
 
-If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: https://discord.com/invite/rFMnCG5MZ7
+If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: <https://discord.com/invite/rFMnCG5MZ7>

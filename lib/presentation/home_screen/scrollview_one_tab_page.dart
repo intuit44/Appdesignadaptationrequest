@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../core/utils/validation_functions.dart';
+import '../../core/providers/course_providers.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'models/classlist_item_model.dart';
+import '../../widgets/course_card_widget.dart';
 import 'notifier/home_notifier.dart';
-import 'widgets/classlist_item_widget.dart';
 
 class ScrollviewOneTabPage extends ConsumerStatefulWidget {
   const ScrollviewOneTabPage({super.key});
@@ -75,12 +75,83 @@ class ScrollviewOneTabPageState extends ConsumerState<ScrollviewOneTabPage> {
     );
   }
 
-  /// Section Widget
+  /// Section Widget - Muestra cursos reales de WooCommerce
   Widget _buildClassList(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 24.h, right: 18.h),
       child: Consumer(
         builder: (context, ref, _) {
+          final coursesState = ref.watch(courseRepositoryProvider);
+          final courses = coursesState.courses;
+          final isLoading = coursesState.isLoading;
+          final error = coursesState.error;
+
+          // Estado de carga
+          if (isLoading && courses.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Column(
+                  children: [
+                    const CircularProgressIndicator(),
+                    SizedBox(height: 16.h),
+                    Text(
+                      "msg_loading_courses".tr,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Estado de error
+          if (error != null && courses.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48.h,
+                      color: appTheme.red600,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      "msg_error_loading".tr,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    SizedBox(height: 16.h),
+                    CustomElevatedButton(
+                      text: "Reintentar",
+                      width: 150.h,
+                      onPressed: () {
+                        ref
+                            .read(courseRepositoryProvider.notifier)
+                            .loadCourses(refresh: true);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Sin cursos
+          if (courses.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Text(
+                  "msg_no_courses".tr,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+            );
+          }
+
+          // Lista de cursos reales
           return ListView.separated(
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
@@ -88,19 +159,18 @@ class ScrollviewOneTabPageState extends ConsumerState<ScrollviewOneTabPage> {
             separatorBuilder: (context, index) {
               return SizedBox(height: 14.h);
             },
-            itemCount: ref
-                    .watch(homeNotifier)
-                    .scrollviewOneTabModelObj
-                    ?.classlistItemList
-                    .length ??
-                0,
+            itemCount: courses.length,
             itemBuilder: (context, index) {
-              ClasslistItemModel model = ref
-                      .watch(homeNotifier)
-                      .scrollviewOneTabModelObj
-                      ?.classlistItemList[index] ??
-                  ClasslistItemModel();
-              return ClasslistItemWidget(model);
+              final course = courses[index];
+              return CourseCardWidget(
+                course: course,
+                onTap: () {
+                  NavigatorService.pushNamed(
+                    AppRoutes.eduviCourseDetailsScreen,
+                    arguments: {'courseId': course.id},
+                  );
+                },
+              );
             },
           );
         },

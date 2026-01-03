@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/app_export.dart';
+import 'core/network/api_client.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
-void main() {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Future.wait([
+
+  // Inicializar en paralelo
+  await Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+    dotenv.load(fileName: '.env'),
+    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
     PrefUtils().init(),
-  ]).then((value) {
-    runApp(const ProviderScope(child: MyApp()));
-  });
+  ]);
+
+  // Inicializar ApiClient después de dotenv
+  ApiClient.instance;
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

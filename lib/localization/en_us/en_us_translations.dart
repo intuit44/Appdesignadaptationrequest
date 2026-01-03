@@ -224,6 +224,10 @@ final Map<String, String> enUs = {
   "msg_professional_education": "Professional Education",
   "msg_serach_class_course": "Serach Class, Course",
   "msg_signup_with_google": "Signup with google",
+  "msg_signing_in": "Signing in...",
+  "msg_loading_courses": "Loading courses...",
+  "msg_error_loading": "Error loading data",
+  "msg_no_courses": "No courses available",
   "msg_standard_1_is_a":
       "Standard 1 is a foundation Standard that reflects 7 important concepts...",
   "msg_standard_2_builds":

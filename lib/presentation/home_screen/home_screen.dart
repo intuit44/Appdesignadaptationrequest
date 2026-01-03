@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
+import '../../core/providers/course_providers.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_subtitle.dart';
@@ -33,6 +34,12 @@ class HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     tabviewController = TabController(length: 3, vsync: this);
+
+    // Cargar cursos al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(courseRepositoryProvider.notifier).loadCourses();
+      ref.read(courseRepositoryProvider.notifier).loadFeaturedCourses();
+    });
   }
 
   @override

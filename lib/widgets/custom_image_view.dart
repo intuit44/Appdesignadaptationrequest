@@ -20,7 +20,8 @@ extension ImageTypeExtension on String {
 enum ImageType { svg, png, network, file, unknown }
 
 class CustomImageView extends StatelessWidget {
-  const CustomImageView({super.key, 
+  const CustomImageView({
+    super.key,
     this.imagePath,
     this.height,
     this.width,
@@ -72,7 +73,7 @@ class CustomImageView extends StatelessWidget {
   }
 
   ///build the image with border radius
-  _buildCircleImage() {
+  dynamic _buildCircleImage() {
     if (radius != null) {
       return ClipRRect(
         borderRadius: radius ?? BorderRadius.zero,
@@ -84,7 +85,7 @@ class CustomImageView extends StatelessWidget {
   }
 
   ///build the image with border and border radius style
-  _buildImageWithBorder() {
+  Widget _buildImageWithBorder() {
     if (border != null) {
       return Container(
         decoration: BoxDecoration(border: border, borderRadius: radius),
@@ -107,13 +108,12 @@ class CustomImageView extends StatelessWidget {
               height: height,
               width: width,
               fit: fit ?? BoxFit.contain,
-              colorFilter:
-                  color != null
-                      ? ColorFilter.mode(
-                        color ?? Colors.transparent,
-                        BlendMode.srcIn,
-                      )
-                      : null,
+              colorFilter: color != null
+                  ? ColorFilter.mode(
+                      color ?? Colors.transparent,
+                      BlendMode.srcIn,
+                    )
+                  : null,
             ),
           );
         case ImageType.file:
@@ -131,22 +131,20 @@ class CustomImageView extends StatelessWidget {
             fit: fit,
             imageUrl: imagePath!,
             color: color,
-            placeholder:
-                (context, url) => SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: LinearProgressIndicator(
-                    color: Colors.grey.shade200,
-                    backgroundColor: Colors.grey.shade100,
-                  ),
-                ),
-            errorWidget:
-                (context, url, error) => Image.asset(
-                  placeHolder,
-                  height: height,
-                  width: width,
-                  fit: fit ?? BoxFit.cover,
-                ),
+            placeholder: (context, url) => SizedBox(
+              height: 30,
+              width: 30,
+              child: LinearProgressIndicator(
+                color: Colors.grey.shade200,
+                backgroundColor: Colors.grey.shade100,
+              ),
+            ),
+            errorWidget: (context, url, error) => Image.asset(
+              placeHolder,
+              height: height,
+              width: width,
+              fit: fit ?? BoxFit.cover,
+            ),
           );
         case ImageType.png:
         default:
