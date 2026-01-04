@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:extended_image/extended_image.dart';
 import '../../core/app_export.dart';
 import '../../core/utils/validation_functions.dart';
+import '../../data/repositories/shop_repository.dart';
+import '../../data/models/product_model.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_drop_down.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -8,13 +11,8 @@ import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_rating_bar.dart';
 import '../../widgets/custom_search_view.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'models/booklist_item_model.dart';
-import 'models/list_item_model.dart';
-import 'models/list_one_item_model.dart';
+import '../product_detail_screen/product_detail_screen.dart';
 import 'notifier/eduvi_online_shop_one_notifier.dart';
-import 'widgets/booklist_item_widget.dart';
-import 'widgets/list_item_widget.dart';
-import 'widgets/list_one_item_widget.dart';
 
 class ScrollviewOneTab1Page extends ConsumerStatefulWidget {
   const ScrollviewOneTab1Page({super.key});
@@ -24,6 +22,19 @@ class ScrollviewOneTab1Page extends ConsumerStatefulWidget {
 }
 
 class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
+  /// Navega al detalle del producto
+  void _navigateToProductDetail(ProductModel product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(
+          productId: product.id,
+          product: product,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -204,32 +215,90 @@ class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
     );
   }
 
-  /// Section Widget
+  /// Section Widget - Lista de productos de WooCommerce
   Widget _buildBookList(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 34.h, right: 30.h),
+      padding: EdgeInsets.only(left: 20.h, right: 20.h),
       child: Consumer(
         builder: (context, ref, _) {
-          return ListView.separated(
+          final shopState = ref.watch(shopRepositoryProvider);
+
+          // Estado de carga
+          if (shopState.isLoading && shopState.products.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(color: appTheme.deepOrange400),
+                    SizedBox(height: 16.h),
+                    Text(
+                      "Cargando productos...",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Estado de error
+          if (shopState.error != null && shopState.products.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Column(
+                  children: [
+                    Icon(Icons.error_outline,
+                        size: 48.h, color: Colors.red.shade300),
+                    SizedBox(height: 16.h),
+                    Text(
+                      "Error al cargar productos",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    SizedBox(height: 8.h),
+                    TextButton(
+                      onPressed: () {
+                        ref
+                            .read(shopRepositoryProvider.notifier)
+                            .loadProducts(refresh: true);
+                      },
+                      child: const Text("Reintentar"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Sin productos
+          if (shopState.products.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.h),
+                child: Text(
+                  "No hay productos disponibles",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
+            );
+          }
+
+          // Grid de productos reales
+          return GridView.builder(
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            separatorBuilder: (context, index) {
-              return SizedBox(height: 18.h);
-            },
-            itemCount: ref
-                    .watch(eduviOnlineShopOneNotifier)
-                    .scrollviewOneTab1ModelObj
-                    ?.booklistItemList
-                    .length ??
-                0,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12.h,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: shopState.products.length,
             itemBuilder: (context, index) {
-              BooklistItemModel model = ref
-                      .watch(eduviOnlineShopOneNotifier)
-                      .scrollviewOneTab1ModelObj
-                      ?.booklistItemList[index] ??
-                  BooklistItemModel();
-              return BooklistItemWidget(model);
+              final product = shopState.products[index];
+              return _buildProductCard(product);
             },
           );
         },
@@ -237,7 +306,146 @@ class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
     );
   }
 
-  /// Section Widget
+  /// Construye una tarjeta de producto
+  Widget _buildProductCard(ProductModel product) {
+    final imageUrl =
+        product.images.isNotEmpty ? product.images.first.src : null;
+    final rating = double.tryParse(product.averageRating) ?? 0;
+
+    return GestureDetector(
+      onTap: () => _navigateToProductDetail(product),
+      child: Container(
+        decoration: BoxDecoration(
+          color: appTheme.whiteA700,
+          borderRadius: BorderRadius.circular(10.h),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Imagen
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(10.h)),
+                child: imageUrl != null && imageUrl.isNotEmpty
+                    ? ExtendedImage.network(
+                        imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        cache: true,
+                        loadStateChanged: (state) {
+                          switch (state.extendedImageLoadState) {
+                            case LoadState.loading:
+                              return Container(
+                                color: Colors.grey.shade200,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: appTheme.deepOrange400,
+                                  ),
+                                ),
+                              );
+                            case LoadState.failed:
+                              return Container(
+                                color: Colors.grey.shade200,
+                                child: Icon(
+                                  Icons.image_not_supported_outlined,
+                                  size: 40.h,
+                                  color: Colors.grey.shade400,
+                                ),
+                              );
+                            case LoadState.completed:
+                              return null;
+                          }
+                        },
+                      )
+                    : Container(
+                        color: Colors.grey.shade200,
+                        child: Icon(
+                          Icons.shopping_bag_outlined,
+                          size: 40.h,
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+              ),
+            ),
+            // Info del producto
+            Padding(
+              padding: EdgeInsets.all(8.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    product.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: CustomTextStyles.titleSmallGray90001,
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$${product.price}',
+                        style: TextStyle(
+                          fontSize: 14.fSize,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme.deepOrange400,
+                        ),
+                      ),
+                      if (rating > 0)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.star, size: 12.h, color: Colors.amber),
+                            SizedBox(width: 2.h),
+                            Text(
+                              rating.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 10.fSize,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  if (product.onSale)
+                    Container(
+                      margin: EdgeInsets.only(top: 4.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 6.h, vertical: 2.h),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade100,
+                        borderRadius: BorderRadius.circular(4.h),
+                      ),
+                      child: Text(
+                        'OFERTA',
+                        style: TextStyle(
+                          fontSize: 9.fSize,
+                          color: Colors.red.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Section Widget - Productos Populares (Featured)
   Widget _buildPopularBooks(BuildContext context) {
     return SizedBox(
       width: double.maxFinite,
@@ -245,44 +453,186 @@ class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "lbl_popular_books".tr,
+            "Productos Populares",
             style: CustomTextStyles.headlineSmallBlack9000124,
           ),
           SizedBox(height: 6.h),
           Consumer(
             builder: (context, ref, _) {
-              return ListView.separated(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: 10.h);
-                },
-                itemCount: ref
-                        .watch(eduviOnlineShopOneNotifier)
-                        .scrollviewOneTab1ModelObj
-                        ?.listItemList
-                        .length ??
-                    0,
-                itemBuilder: (context, index) {
-                  ListItemModel model = ref
-                          .watch(eduviOnlineShopOneNotifier)
-                          .scrollviewOneTab1ModelObj
-                          ?.listItemList[index] ??
-                      ListItemModel();
-                  return ListItemWidget(model);
-                },
-              );
+              final shopState = ref.watch(shopRepositoryProvider);
+
+              // Filtrar productos destacados
+              final featuredProducts =
+                  shopState.products.where((p) => p.featured).take(4).toList();
+
+              if (shopState.isLoading && shopState.products.isEmpty) {
+                return _buildLoadingIndicator();
+              }
+
+              if (featuredProducts.isEmpty) {
+                // Si no hay destacados, tomar los primeros 4
+                final topProducts = shopState.products.take(4).toList();
+                if (topProducts.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return _buildHorizontalProductList(topProducts);
+              }
+
+              return _buildHorizontalProductList(featuredProducts);
             },
           ),
-          SizedBox(height: 20.h),
-          Text("lbl_see_more".tr, style: CustomTextStyles.titleMediumPrimary),
         ],
       ),
     );
   }
 
-  /// Section Widget
+  /// Widget para mostrar indicador de carga
+  Widget _buildLoadingIndicator() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: SizedBox(
+          width: 24.h,
+          height: 24.h,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: appTheme.deepOrange400,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Widget para lista horizontal de productos
+  Widget _buildHorizontalProductList(List<ProductModel> products) {
+    return SizedBox(
+      height: 200.h,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: products.length,
+        separatorBuilder: (context, index) => SizedBox(width: 12.h),
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return SizedBox(
+            width: 140.h,
+            child: _buildCompactProductCard(product),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Tarjeta compacta para listas horizontales
+  Widget _buildCompactProductCard(ProductModel product) {
+    final imageUrl =
+        product.images.isNotEmpty ? product.images.first.src : null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: appTheme.whiteA700,
+        borderRadius: BorderRadius.circular(10.h),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen
+          Expanded(
+            flex: 3,
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10.h)),
+              child: imageUrl != null && imageUrl.isNotEmpty
+                  ? ExtendedImage.network(
+                      imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      cache: true,
+                      loadStateChanged: (state) {
+                        switch (state.extendedImageLoadState) {
+                          case LoadState.loading:
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 20.h,
+                                  height: 20.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: appTheme.deepOrange400,
+                                  ),
+                                ),
+                              ),
+                            );
+                          case LoadState.failed:
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 30.h,
+                                color: Colors.grey.shade400,
+                              ),
+                            );
+                          case LoadState.completed:
+                            return null;
+                        }
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade200,
+                      child: Icon(
+                        Icons.shopping_bag_outlined,
+                        size: 30.h,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+            ),
+          ),
+          // Info
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.all(8.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      product.name,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontSize: 12.fSize,
+                        fontWeight: FontWeight.w500,
+                        color: appTheme.gray90001,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '\$${product.price}',
+                    style: TextStyle(
+                      fontSize: 14.fSize,
+                      fontWeight: FontWeight.bold,
+                      color: appTheme.deepOrange400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Section Widget - Nuevos Productos
   Widget _buildNewArrivals(BuildContext context) {
     return SizedBox(
       width: double.maxFinite,
@@ -290,38 +640,36 @@ class ScrollviewOneTab1PageState extends ConsumerState<ScrollviewOneTab1Page> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "lbl_new_arrivals".tr,
+            "Nuevos Productos",
             style: CustomTextStyles.headlineSmallBlack9000124,
           ),
           SizedBox(height: 10.h),
           Consumer(
             builder: (context, ref, _) {
-              return ListView.separated(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: 10.h);
-                },
-                itemCount: ref
-                        .watch(eduviOnlineShopOneNotifier)
-                        .scrollviewOneTab1ModelObj
-                        ?.listOneItemList
-                        .length ??
-                    0,
-                itemBuilder: (context, index) {
-                  ListOneItemModel model = ref
-                          .watch(eduviOnlineShopOneNotifier)
-                          .scrollviewOneTab1ModelObj
-                          ?.listOneItemList[index] ??
-                      ListOneItemModel();
-                  return ListOneItemWidget(model);
-                },
-              );
+              final shopState = ref.watch(shopRepositoryProvider);
+
+              if (shopState.isLoading && shopState.products.isEmpty) {
+                return _buildLoadingIndicator();
+              }
+
+              // Ordenar por fecha de creación (más recientes primero)
+              final sortedProducts =
+                  List<ProductModel>.from(shopState.products);
+              sortedProducts.sort((a, b) {
+                final dateA = a.dateCreated ?? DateTime(2000);
+                final dateB = b.dateCreated ?? DateTime(2000);
+                return dateB.compareTo(dateA);
+              });
+
+              final newProducts = sortedProducts.take(4).toList();
+
+              if (newProducts.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return _buildHorizontalProductList(newProducts);
             },
           ),
-          SizedBox(height: 20.h),
-          Text("lbl_see_more".tr, style: CustomTextStyles.titleMediumPrimary),
         ],
       ),
     );

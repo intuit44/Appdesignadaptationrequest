@@ -16,20 +16,12 @@ class StorageKeys {
 
 /// Servicio de almacenamiento seguro
 /// Usa flutter_secure_storage para datos sensibles
+/// Inicialización lazy para evitar bloqueo en startup
 class SecureStorage {
   static SecureStorage? _instance;
-  late final FlutterSecureStorage _storage;
+  FlutterSecureStorage? _storage;
 
-  SecureStorage._() {
-    _storage = const FlutterSecureStorage(
-      aOptions: AndroidOptions(
-          // Usar cifrado predeterminado (migración automática)
-          ),
-      iOptions: IOSOptions(
-        accessibility: KeychainAccessibility.first_unlock_this_device,
-      ),
-    );
-  }
+  SecureStorage._();
 
   /// Singleton instance
   static SecureStorage get instance {
@@ -37,21 +29,34 @@ class SecureStorage {
     return _instance!;
   }
 
+  /// Obtiene storage con inicialización lazy
+  FlutterSecureStorage get _secureStorage {
+    _storage ??= const FlutterSecureStorage(
+      aOptions: AndroidOptions(
+          // Usar cifrado predeterminado (migración automática)
+          ),
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.first_unlock_this_device,
+      ),
+    );
+    return _storage!;
+  }
+
   // ==================== JWT Token ====================
 
   /// Guarda el JWT token
   Future<void> saveJwtToken(String token) async {
-    await _storage.write(key: StorageKeys.jwtToken, value: token);
+    await _secureStorage.write(key: StorageKeys.jwtToken, value: token);
   }
 
   /// Obtiene el JWT token
   Future<String?> getJwtToken() async {
-    return await _storage.read(key: StorageKeys.jwtToken);
+    return await _secureStorage.read(key: StorageKeys.jwtToken);
   }
 
   /// Elimina el JWT token
   Future<void> deleteJwtToken() async {
-    await _storage.delete(key: StorageKeys.jwtToken);
+    await _secureStorage.delete(key: StorageKeys.jwtToken);
   }
 
   /// Verifica si hay un token guardado
@@ -63,39 +68,39 @@ class SecureStorage {
   // ==================== Refresh Token ====================
 
   Future<void> saveRefreshToken(String token) async {
-    await _storage.write(key: StorageKeys.refreshToken, value: token);
+    await _secureStorage.write(key: StorageKeys.refreshToken, value: token);
   }
 
   Future<String?> getRefreshToken() async {
-    return await _storage.read(key: StorageKeys.refreshToken);
+    return await _secureStorage.read(key: StorageKeys.refreshToken);
   }
 
   Future<void> deleteRefreshToken() async {
-    await _storage.delete(key: StorageKeys.refreshToken);
+    await _secureStorage.delete(key: StorageKeys.refreshToken);
   }
 
   // ==================== User ID ====================
 
   Future<void> saveUserId(String id) async {
-    await _storage.write(key: StorageKeys.userId, value: id);
+    await _secureStorage.write(key: StorageKeys.userId, value: id);
   }
 
   Future<String?> getUserId() async {
-    return await _storage.read(key: StorageKeys.userId);
+    return await _secureStorage.read(key: StorageKeys.userId);
   }
 
   Future<void> deleteUserId() async {
-    await _storage.delete(key: StorageKeys.userId);
+    await _secureStorage.delete(key: StorageKeys.userId);
   }
 
   // ==================== User Email ====================
 
   Future<void> saveUserEmail(String email) async {
-    await _storage.write(key: StorageKeys.userEmail, value: email);
+    await _secureStorage.write(key: StorageKeys.userEmail, value: email);
   }
 
   Future<String?> getUserEmail() async {
-    return await _storage.read(key: StorageKeys.userEmail);
+    return await _secureStorage.read(key: StorageKeys.userEmail);
   }
 
   // ==================== WooCommerce Credentials ====================
@@ -105,14 +110,15 @@ class SecureStorage {
     required String consumerSecret,
   }) async {
     await Future.wait([
-      _storage.write(key: StorageKeys.wcConsumerKey, value: consumerKey),
-      _storage.write(key: StorageKeys.wcConsumerSecret, value: consumerSecret),
+      _secureStorage.write(key: StorageKeys.wcConsumerKey, value: consumerKey),
+      _secureStorage.write(
+          key: StorageKeys.wcConsumerSecret, value: consumerSecret),
     ]);
   }
 
   Future<Map<String, String>?> getWcCredentials() async {
-    final key = await _storage.read(key: StorageKeys.wcConsumerKey);
-    final secret = await _storage.read(key: StorageKeys.wcConsumerSecret);
+    final key = await _secureStorage.read(key: StorageKeys.wcConsumerKey);
+    final secret = await _secureStorage.read(key: StorageKeys.wcConsumerSecret);
     if (key == null || secret == null) return null;
     return {'consumerKey': key, 'consumerSecret': secret};
   }
@@ -120,36 +126,37 @@ class SecureStorage {
   // ==================== App Settings ====================
 
   Future<void> saveThemeMode(String mode) async {
-    await _storage.write(key: StorageKeys.themeMode, value: mode);
+    await _secureStorage.write(key: StorageKeys.themeMode, value: mode);
   }
 
   Future<String?> getThemeMode() async {
-    return await _storage.read(key: StorageKeys.themeMode);
+    return await _secureStorage.read(key: StorageKeys.themeMode);
   }
 
   Future<void> setOnboardingCompleted(bool completed) async {
-    await _storage.write(
+    await _secureStorage.write(
       key: StorageKeys.onboardingCompleted,
       value: completed.toString(),
     );
   }
 
   Future<bool> isOnboardingCompleted() async {
-    final value = await _storage.read(key: StorageKeys.onboardingCompleted);
+    final value =
+        await _secureStorage.read(key: StorageKeys.onboardingCompleted);
     return value == 'true';
   }
 
   // ==================== Sync ====================
 
   Future<void> saveLastSyncDate(DateTime date) async {
-    await _storage.write(
+    await _secureStorage.write(
       key: StorageKeys.lastSyncDate,
       value: date.toIso8601String(),
     );
   }
 
   Future<DateTime?> getLastSyncDate() async {
-    final value = await _storage.read(key: StorageKeys.lastSyncDate);
+    final value = await _secureStorage.read(key: StorageKeys.lastSyncDate);
     if (value == null) return null;
     return DateTime.tryParse(value);
   }
@@ -162,35 +169,35 @@ class SecureStorage {
       deleteJwtToken(),
       deleteRefreshToken(),
       deleteUserId(),
-      _storage.delete(key: StorageKeys.userEmail),
+      _secureStorage.delete(key: StorageKeys.userEmail),
     ]);
   }
 
   /// Limpia TODO el almacenamiento
   Future<void> clearAll() async {
-    await _storage.deleteAll();
+    await _secureStorage.deleteAll();
   }
 
   // ==================== Generic Methods ====================
 
   /// Guarda un valor genérico
   Future<void> write(String key, String value) async {
-    await _storage.write(key: key, value: value);
+    await _secureStorage.write(key: key, value: value);
   }
 
   /// Lee un valor genérico
   Future<String?> read(String key) async {
-    return await _storage.read(key: key);
+    return await _secureStorage.read(key: key);
   }
 
   /// Elimina un valor genérico
   Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+    await _secureStorage.delete(key: key);
   }
 
   /// Obtiene todas las keys almacenadas
   Future<Map<String, String>> readAll() async {
-    return await _storage.readAll();
+    return await _secureStorage.readAll();
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
+import '../../data/repositories/shop_repository.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_subtitle.dart';
 import '../../widgets/app_bar/appbar_title.dart';
@@ -29,6 +30,12 @@ class EduviOnlineShopOneScreenState
   void initState() {
     super.initState();
     tabviewController = TabController(length: 3, vsync: this);
+
+    // Cargar productos al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(shopRepositoryProvider.notifier).loadProducts();
+      ref.read(shopRepositoryProvider.notifier).loadCategories();
+    });
   }
 
   @override

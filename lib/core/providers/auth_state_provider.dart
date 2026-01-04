@@ -58,6 +58,7 @@ class GlobalAuthState {
 class AuthStateNotifier extends StateNotifier<GlobalAuthState> {
   final AuthService _authService;
   final SecureStorage _storage;
+  bool _initialized = false;
 
   AuthStateNotifier({
     AuthService? authService,
@@ -65,51 +66,68 @@ class AuthStateNotifier extends StateNotifier<GlobalAuthState> {
   })  : _authService = authService ?? AuthService(),
         _storage = storage ?? SecureStorage.instance,
         super(const GlobalAuthState()) {
-    _init();
+    // Diferir _init para no bloquear el constructor
+    Future.microtask(_init);
   }
 
   /// Inicializa el estado verificando si hay sesión activa
+  /// Ejecuta en microtask para no bloquear UI
   Future<void> _init() async {
-    state = state.copyWith(status: AuthStatus.loading);
+    if (_initialized) return;
+    _initialized = true;
 
+    // No mostrar loading inmediatamente, mantener estado inicial
+    // hasta tener resultado real
     try {
-      // Verificar si hay token JWT guardado
-      final hasToken = await _storage.hasJwtToken();
+      // Verificar Firebase primero (rápido, en memoria)
       final firebaseUser = _authService.currentFirebaseUser;
 
-      if (hasToken || firebaseUser != null) {
-        // Hay sesión activa
-        final userId = await _storage.getUserId();
-
+      if (firebaseUser != null) {
+        // Sesión de Firebase activa - actualizar UI inmediatamente
         state = state.copyWith(
           status: AuthStatus.authenticated,
           firebaseUser: firebaseUser,
-          isGoogleSignIn: firebaseUser != null,
+          isGoogleSignIn: true,
+        );
+        return;
+      }
+
+      // Verificar token JWT (acceso a secure storage - más lento)
+      // Solo si no hay sesión de Firebase
+      final hasToken = await _storage.hasJwtToken();
+
+      if (hasToken) {
+        final userId = await _storage.getUserId();
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          isGoogleSignIn: false,
         );
 
-        // Intentar cargar datos de usuario de WooCommerce
+        // Cargar perfil de WooCommerce en background (no bloquea UI)
         if (userId != null) {
-          try {
-            final userProfile =
-                await _authService.getUserProfile(int.parse(userId));
-            if (userProfile != null) {
-              state = state.copyWith(user: userProfile);
-            }
-            // Si falla, continuamos sin perfil completo (no cerramos sesión)
-          } catch (e) {
-            // Error al cargar perfil - continuar sin datos completos
-            // La sesión sigue activa, solo faltan datos de perfil
-          }
+          _loadUserProfileInBackground(userId);
         }
       } else {
         state = state.copyWith(status: AuthStatus.unauthenticated);
       }
     } catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        errorMessage: 'Error al verificar sesión',
-      );
+      state = state.copyWith(status: AuthStatus.unauthenticated);
     }
+  }
+
+  /// Carga el perfil de usuario en background sin bloquear UI
+  void _loadUserProfileInBackground(String userId) {
+    Future.microtask(() async {
+      try {
+        final userProfile =
+            await _authService.getUserProfile(int.parse(userId));
+        if (userProfile != null && mounted) {
+          state = state.copyWith(user: userProfile);
+        }
+      } catch (_) {
+        // Error silencioso - el usuario ya está autenticado
+      }
+    });
   }
 
   /// Login con Google

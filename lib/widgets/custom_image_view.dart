@@ -108,12 +108,19 @@ class CustomImageView extends StatelessWidget {
               height: height,
               width: width,
               fit: fit ?? BoxFit.contain,
+              // Ignorar elementos no soportados como <filter>
+              allowDrawingOutsideViewBox: true,
               colorFilter: color != null
                   ? ColorFilter.mode(
                       color ?? Colors.transparent,
                       BlendMode.srcIn,
                     )
                   : null,
+              // Placeholder mientras carga
+              placeholderBuilder: (context) => SizedBox(
+                height: height,
+                width: width,
+              ),
             ),
           );
         case ImageType.file:

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "413116602762-71mk1uh0lha29u1977rcmur6kpu7ckuq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fibroskinbeautyacademy.app",
+            "certificate_hash": "aba2bcb9bec36350a377dbb3595958fc6d59f1c3"
+          }
+        },
+        {
           "client_id": "413116602762-7693pg4s0lg2lbqcru1nfguh8i673hup.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "413116602762-7693pg4s0lg2lbqcru1nfguh8i673hup.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "413116602762-1eimfcq2a6i5nqqi76cfaatuu5khjo8m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yellowstonelogisticsllcsapplication.yellowstoneLogisticsLlcSApplication2"
+              }
             }
           ]
         }
