@@ -9,3 +9,6 @@
 /ios/Podfile
 /pubspec.lock
 *.hprof
+
+# Proyectos anidados temporales
+/tempfix/
