@@ -174,7 +174,7 @@ class CourseCardWidget extends StatelessWidget {
 
   void _navigateToCourseDetails(BuildContext context) {
     NavigatorService.pushNamed(
-      AppRoutes.eduviCourseDetailsScreen,
+      AppRoutes.fibroCourseDetailsScreen,
       arguments: {'courseId': course.id},
     );
   }

@@ -166,7 +166,7 @@ class ScrollviewOneTabPageState extends ConsumerState<ScrollviewOneTabPage> {
                 course: course,
                 onTap: () {
                   NavigatorService.pushNamed(
-                    AppRoutes.eduviCourseDetailsScreen,
+                    AppRoutes.fibroCourseDetailsScreen,
                     arguments: {'courseId': course.id},
                   );
                 },

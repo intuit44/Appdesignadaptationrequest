@@ -44,117 +44,121 @@ class SignInDialogState extends ConsumerState<SignInDialog> {
       }
     });
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Form(
-          key: _formKey,
-          child: SizedBox(
-            width: double.maxFinite,
-            child: SingleChildScrollView(
-              child: Container(
+    return Flexible(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Form(
+              key: _formKey,
+              child: SizedBox(
                 width: double.maxFinite,
-                padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 98.h),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: double.maxFinite,
-                      padding: EdgeInsets.only(
-                        left: 20.h,
-                        top: 30.h,
-                        right: 20.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: appTheme.whiteA700,
-                        borderRadius: BorderRadiusStyle.roundedBorder5,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildSignupWithGoogleButton(context),
-                          SizedBox(height: 26.h),
-                          Container(
-                            width: double.maxFinite,
-                            margin: EdgeInsets.symmetric(horizontal: 20.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 1.h,
-                                    width: 20.h,
-                                    margin: EdgeInsets.only(top: 8.h),
-                                    decoration: BoxDecoration(
-                                      color: appTheme.gray700,
+                child: SingleChildScrollView(
+                  child: Container(
+                    width: double.maxFinite,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.h, vertical: 98.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: double.maxFinite,
+                          padding: EdgeInsets.only(
+                            left: 20.h,
+                            top: 30.h,
+                            right: 20.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: appTheme.whiteA700,
+                            borderRadius: BorderRadiusStyle.roundedBorder5,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildSignupWithGoogleButton(context),
+                              SizedBox(height: 26.h),
+                              Container(
+                                width: double.maxFinite,
+                                margin: EdgeInsets.symmetric(horizontal: 20.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 1.h,
+                                        margin: EdgeInsets.only(top: 2.h),
+                                        decoration: BoxDecoration(
+                                          color: appTheme.gray700,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(width: 10.h),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "msg_or_sign_in_with".tr,
-                                    style: theme.textTheme.bodyLarge,
-                                  ),
-                                ),
-                                SizedBox(width: 10.h),
-                                Expanded(
-                                  child: Container(
-                                    height: 1.h,
-                                    width: 20.h,
-                                    margin: EdgeInsets.only(top: 8.h),
-                                    decoration: BoxDecoration(
-                                      color: appTheme.gray700,
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.h),
+                                      child: Text(
+                                        "msg_or_sign_in_with".tr,
+                                        style: theme.textTheme.bodyLarge,
+                                      ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: Container(
+                                        height: 1.h,
+                                        margin: EdgeInsets.only(top: 2.h),
+                                        decoration: BoxDecoration(
+                                          color: appTheme.gray700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(height: 28.h),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "lbl_email".tr,
+                                  style:
+                                      CustomTextStyles.titleMediumGray90001_1,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              _buildEmailInputField(context),
+                              SizedBox(height: 20.h),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "lbl_passord".tr,
+                                  style:
+                                      CustomTextStyles.titleMediumGray90001_1,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              _buildPasswordInputField(context),
+                              SizedBox(height: 30.h),
+                              _buildSignUpButton(context),
+                              SizedBox(height: 22.h),
+                              _buildKeepMeSignedInCheckbox(context),
+                              SizedBox(height: 40.h),
+                              Text(
+                                "msg_forgot_password".tr,
+                                style: CustomTextStyles.titleSmallGray700_1,
+                              ),
+                              SizedBox(height: 4.h),
+                            ],
                           ),
-                          SizedBox(height: 28.h),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "lbl_email".tr,
-                              style: CustomTextStyles.titleMediumGray90001_1,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          _buildEmailInputField(context),
-                          SizedBox(height: 20.h),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "lbl_passord".tr,
-                              style: CustomTextStyles.titleMediumGray90001_1,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          _buildPasswordInputField(context),
-                          SizedBox(height: 30.h),
-                          _buildSignUpButton(context),
-                          SizedBox(height: 22.h),
-                          _buildKeepMeSignedInCheckbox(context),
-                          SizedBox(height: 40.h),
-                          Text(
-                            "msg_forgot_password".tr,
-                            style: CustomTextStyles.titleSmallGray700_1,
-                          ),
-                          SizedBox(height: 4.h),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: 12.h),
+                      ],
                     ),
-                    SizedBox(height: 12.h),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

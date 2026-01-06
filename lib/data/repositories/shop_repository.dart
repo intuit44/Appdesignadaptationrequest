@@ -4,14 +4,67 @@ import '../services/woocommerce_service.dart';
 import '../models/product_model.dart';
 import '../models/order_model.dart';
 
+/// Item del carrito local
+class LocalCartItem {
+  final ProductModel product;
+  final int quantity;
+
+  const LocalCartItem({
+    required this.product,
+    this.quantity = 1,
+  });
+
+  double get subtotal => (double.tryParse(product.price) ?? 0) * quantity;
+
+  LocalCartItem copyWith({int? quantity}) {
+    return LocalCartItem(
+      product: product,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+}
+
+/// Estado del carrito local (sin depender de API)
+class LocalCartState {
+  final List<LocalCartItem> items;
+  final bool isLoading;
+  final String? error;
+
+  const LocalCartState({
+    this.items = const [],
+    this.isLoading = false,
+    this.error,
+  });
+
+  int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
+
+  double get total => items.fold(0.0, (sum, item) => sum + item.subtotal);
+
+  LocalCartState copyWith({
+    List<LocalCartItem>? items,
+    bool? isLoading,
+    String? error,
+  }) {
+    return LocalCartState(
+      items: items ?? this.items,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
 /// Estado para la tienda
 class ShopState {
   final List<ProductModel> products;
   final List<ProductModel> featuredProducts;
   final List<ProductModel> saleProducts;
   final List<ProductCategory> categories;
+  final List<OrderModel> orders;
+  final List<ProductModel> wishlist;
   final bool isLoading;
   final bool isLoadingMore;
+  final bool isLoadingOrders;
+  final bool isLoadingWishlist;
   final String? error;
   final int currentPage;
   final bool hasMore;
@@ -22,8 +75,12 @@ class ShopState {
     this.featuredProducts = const [],
     this.saleProducts = const [],
     this.categories = const [],
+    this.orders = const [],
+    this.wishlist = const [],
     this.isLoading = false,
     this.isLoadingMore = false,
+    this.isLoadingOrders = false,
+    this.isLoadingWishlist = false,
     this.error,
     this.currentPage = 1,
     this.hasMore = true,
@@ -35,8 +92,12 @@ class ShopState {
     List<ProductModel>? featuredProducts,
     List<ProductModel>? saleProducts,
     List<ProductCategory>? categories,
+    List<OrderModel>? orders,
+    List<ProductModel>? wishlist,
     bool? isLoading,
     bool? isLoadingMore,
+    bool? isLoadingOrders,
+    bool? isLoadingWishlist,
     String? error,
     int? currentPage,
     bool? hasMore,
@@ -47,44 +108,16 @@ class ShopState {
       featuredProducts: featuredProducts ?? this.featuredProducts,
       saleProducts: saleProducts ?? this.saleProducts,
       categories: categories ?? this.categories,
+      orders: orders ?? this.orders,
+      wishlist: wishlist ?? this.wishlist,
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      isLoadingOrders: isLoadingOrders ?? this.isLoadingOrders,
+      isLoadingWishlist: isLoadingWishlist ?? this.isLoadingWishlist,
       error: error,
       currentPage: currentPage ?? this.currentPage,
       hasMore: hasMore ?? this.hasMore,
       selectedCategory: selectedCategory ?? this.selectedCategory,
-    );
-  }
-}
-
-/// Estado del carrito
-class CartState {
-  final OrderModel? cart;
-  final bool isLoading;
-  final String? error;
-
-  const CartState({
-    this.cart,
-    this.isLoading = false,
-    this.error,
-  });
-
-  int get itemCount => cart?.lineItems.length ?? 0;
-
-  double get total {
-    final totalStr = cart?.total ?? '0';
-    return double.tryParse(totalStr) ?? 0.0;
-  }
-
-  CartState copyWith({
-    OrderModel? cart,
-    bool? isLoading,
-    String? error,
-  }) {
-    return CartState(
-      cart: cart ?? this.cart,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
     );
   }
 }
@@ -235,73 +268,176 @@ class ShopRepository extends StateNotifier<ShopState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
-}
 
-/// Repositorio del carrito
-class CartRepository extends StateNotifier<CartState> {
-  final WooCommerceService _wcService;
-  int? _customerId;
+  // ============ ORDERS ============
 
-  CartRepository({
-    WooCommerceService? wcService,
-  })  : _wcService = wcService ?? WooCommerceService(),
-        super(const CartState());
+  /// Carga los pedidos del usuario
+  Future<void> loadOrders({int? customerId}) async {
+    if (state.isLoadingOrders) return;
 
-  /// ID del cliente actual
-  int? get customerId => _customerId;
-
-  /// Inicializa el carrito para un cliente
-  Future<void> initCart(int customerId) async {
-    _customerId = customerId;
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoadingOrders: true, error: null);
 
     try {
-      final cart = await _wcService.getOrCreateCart(customerId);
-      state = state.copyWith(cart: cart, isLoading: false);
+      final orders = await _wcService.getOrders(customerId: customerId);
+      state = state.copyWith(
+        orders: orders,
+        isLoadingOrders: false,
+      );
     } catch (e) {
       state = state.copyWith(
-        isLoading: false,
-        error: 'Error al cargar carrito: $e',
+        isLoadingOrders: false,
+        error: 'Error al cargar pedidos: $e',
       );
     }
   }
 
+  // ============ WISHLIST ============
+
+  /// Carga la lista de deseos (desde almacenamiento local)
+  Future<void> loadWishlist() async {
+    if (state.isLoadingWishlist) return;
+
+    state = state.copyWith(isLoadingWishlist: true);
+
+    // La wishlist se maneja localmente, inicializar vacía si no hay datos
+    await Future.delayed(const Duration(milliseconds: 100));
+    state = state.copyWith(isLoadingWishlist: false);
+  }
+
+  /// Agrega un producto a la wishlist
+  void addToWishlist(ProductModel product) {
+    if (state.wishlist.any((p) => p.id == product.id)) return;
+
+    state = state.copyWith(
+      wishlist: [...state.wishlist, product],
+    );
+  }
+
+  /// Elimina un producto de la wishlist
+  void removeFromWishlist(int productId) {
+    state = state.copyWith(
+      wishlist: state.wishlist.where((p) => p.id != productId).toList(),
+    );
+  }
+
+  /// Verifica si un producto está en la wishlist
+  bool isInWishlist(int productId) {
+    return state.wishlist.any((p) => p.id == productId);
+  }
+
+  /// Limpia toda la wishlist
+  void clearWishlist() {
+    state = state.copyWith(wishlist: []);
+  }
+}
+
+/// Repositorio del carrito LOCAL
+/// Maneja el carrito en memoria sin depender de API
+class LocalCartRepository extends StateNotifier<LocalCartState> {
+  final WooCommerceService _wcService;
+
+  LocalCartRepository({
+    WooCommerceService? wcService,
+  })  : _wcService = wcService ?? WooCommerceService(),
+        super(const LocalCartState());
+
   /// Agrega producto al carrito
-  Future<bool> addToCart(int productId, {int quantity = 1}) async {
-    if (state.cart == null) return false;
+  void addToCart(ProductModel product, {int quantity = 1}) {
+    final existingIndex = state.items.indexWhere(
+      (item) => item.product.id == product.id,
+    );
 
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final updatedCart = await _wcService.addToCart(
-        orderId: state.cart!.id,
-        productId: productId,
-        quantity: quantity,
+    if (existingIndex >= 0) {
+      // Producto ya existe, actualizar cantidad
+      final updatedItems = List<LocalCartItem>.from(state.items);
+      final existing = updatedItems[existingIndex];
+      updatedItems[existingIndex] = existing.copyWith(
+        quantity: existing.quantity + quantity,
       );
-
-      if (updatedCart != null) {
-        state = state.copyWith(cart: updatedCart, isLoading: false);
-        return true;
-      }
-
+      state = state.copyWith(items: updatedItems);
+    } else {
+      // Nuevo producto
       state = state.copyWith(
-        isLoading: false,
-        error: 'No se pudo agregar al carrito',
+        items: [
+          ...state.items,
+          LocalCartItem(product: product, quantity: quantity)
+        ],
       );
-      return false;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Error al agregar al carrito: $e',
-      );
-      return false;
     }
+  }
+
+  /// Actualiza cantidad de un producto
+  void updateQuantity(int productId, int quantity) {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+
+    final updatedItems = state.items.map((item) {
+      if (item.product.id == productId) {
+        return item.copyWith(quantity: quantity);
+      }
+      return item;
+    }).toList();
+
+    state = state.copyWith(items: updatedItems);
+  }
+
+  /// Elimina producto del carrito
+  void removeFromCart(int productId) {
+    final updatedItems =
+        state.items.where((item) => item.product.id != productId).toList();
+    state = state.copyWith(items: updatedItems);
   }
 
   /// Limpia el carrito
   void clearCart() {
-    _customerId = null;
-    state = const CartState();
+    state = const LocalCartState();
+  }
+
+  /// Crea orden en WooCommerce para checkout
+  Future<OrderModel?> createOrderForCheckout() async {
+    if (state.items.isEmpty) return null;
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      // WooCommerce solo necesita product_id y quantity para crear la orden
+      // Los precios son calculados automáticamente por WooCommerce
+      final lineItems = state.items
+          .map((item) => OrderLineItem(
+                id: 0,
+                name: item.product.name,
+                productId: item.product.id,
+                quantity: item.quantity,
+                subtotal: '0', // WooCommerce lo calcula
+                total: '0', // WooCommerce lo calcula
+              ))
+          .toList();
+
+      final order = await _wcService.createOrder(
+        customerId:
+            0, // Guest checkout - WooCommerce asigna por email si existe
+        lineItems: lineItems,
+      );
+
+      if (order != null) {
+        state = state.copyWith(isLoading: false);
+        return order;
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'No se pudo crear la orden',
+        );
+        return null;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Error al crear orden: $e',
+      );
+      return null;
+    }
   }
 
   /// Limpia error
@@ -316,10 +452,10 @@ final shopRepositoryProvider =
   return ShopRepository();
 });
 
-/// Provider para CartRepository
-final cartRepositoryProvider =
-    StateNotifierProvider<CartRepository, CartState>((ref) {
-  return CartRepository();
+/// Provider para LocalCartRepository
+final localCartProvider =
+    StateNotifierProvider<LocalCartRepository, LocalCartState>((ref) {
+  return LocalCartRepository();
 });
 
 /// Provider para productos
@@ -358,10 +494,10 @@ final productSearchProvider =
 
 /// Provider para cantidad de items en carrito
 final cartItemCountProvider = Provider<int>((ref) {
-  return ref.watch(cartRepositoryProvider).itemCount;
+  return ref.watch(localCartProvider).itemCount;
 });
 
 /// Provider para total del carrito
 final cartTotalProvider = Provider<double>((ref) {
-  return ref.watch(cartRepositoryProvider).total;
+  return ref.watch(localCartProvider).total;
 });

@@ -156,6 +156,34 @@ class WooCommerceService {
 
   // ==================== Órdenes ====================
 
+  /// Obtiene todas las órdenes (para admin) o las del cliente si se especifica customerId
+  Future<List<OrderModel>> getOrders({
+    int? customerId,
+    int page = 1,
+    int perPage = 20,
+    String? status,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'page': page,
+      'per_page': perPage,
+    };
+
+    if (customerId != null) queryParams['customer'] = customerId;
+    if (status != null) queryParams['status'] = status;
+
+    final response = await _apiClient.get(
+      ApiEndpoints.orders,
+      queryParameters: queryParams,
+    );
+
+    if (response.data is List) {
+      return (response.data as List)
+          .map((json) => OrderModel.fromJson(json))
+          .toList();
+    }
+    return [];
+  }
+
   /// Crea una nueva orden
   Future<OrderModel?> createOrder({
     required int customerId,

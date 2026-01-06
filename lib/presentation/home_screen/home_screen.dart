@@ -6,6 +6,7 @@ import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_subtitle.dart';
 import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/appbar_trailing_image.dart';
+import '../../widgets/app_bar/cart_icon_button.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_drop_down.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -35,10 +36,12 @@ class HomeScreenState extends ConsumerState<HomeScreen>
     super.initState();
     tabviewController = TabController(length: 3, vsync: this);
 
-    // Cargar cursos al iniciar
+    // Cargar datos al iniciar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(courseRepositoryProvider.notifier).loadCourses();
       ref.read(courseRepositoryProvider.notifier).loadFeaturedCourses();
+      // Inicializar Agent CRM para cursos reales
+      ref.read(agentCRMRepositoryProvider.notifier).initialize();
     });
   }
 
@@ -136,7 +139,8 @@ class HomeScreenState extends ConsumerState<HomeScreen>
       margin: EdgeInsets.only(left: 86.h, right: 72.h),
       buttonTextStyle: CustomTextStyles.titleMediumWhiteA700,
       onPressed: () {
-        NavigatorService.pushNamed(AppRoutes.eduviCourseDetailsScreen);
+        // Navegar a cursos de Agent CRM Pro
+        NavigatorService.pushNamed(AppRoutes.agentCRMCoursesScreen);
       },
     );
   }
@@ -159,6 +163,11 @@ class HomeScreenState extends ConsumerState<HomeScreen>
             },
           ),
           actions: [
+            CartIconButton(
+              height: 28.h,
+              width: 28.h,
+              margin: EdgeInsets.only(right: 8.h),
+            ),
             AppbarSubtitle(
               text: "lbl_menu".tr,
               onTap: () {

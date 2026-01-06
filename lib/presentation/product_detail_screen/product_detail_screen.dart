@@ -497,7 +497,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildBottomBar() {
-    final cartState = ref.watch(cartRepositoryProvider);
+    final cartState = ref.watch(localCartProvider);
     final isInStock = _product?.inStock ?? false;
 
     return Container(
@@ -565,37 +565,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Future<void> _addToCart() async {
     if (_product == null) return;
 
-    try {
-      await ref.read(cartRepositoryProvider.notifier).addToCart(
-            _product!.id,
-            quantity: _quantity,
-          );
+    // Agregar al carrito local
+    ref.read(localCartProvider.notifier).addToCart(
+          _product!,
+          quantity: _quantity,
+        );
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${_product!.name} agregado al carrito'),
-            backgroundColor: Colors.green,
-            action: SnackBarAction(
-              label: 'Ver Carrito',
-              textColor: Colors.white,
-              onPressed: () {
-                // TODO: Navegar al carrito
-                // NavigatorService.pushNamed(AppRoutes.cartScreen);
-              },
-            ),
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_product!.name} agregado al carrito'),
+          backgroundColor: Colors.green,
+          action: SnackBarAction(
+            label: 'Ver Carrito',
+            textColor: Colors.white,
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.cartScreen);
+            },
           ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al agregar al carrito: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+        ),
+      );
     }
   }
 }

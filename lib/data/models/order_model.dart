@@ -19,6 +19,7 @@ class OrderModel {
   final String paymentMethod;
   final String? paymentMethodTitle;
   final String? transactionId;
+  final String? paymentUrl; // URL de pago de WooCommerce/Stripe
 
   OrderModel({
     required this.id,
@@ -39,6 +40,7 @@ class OrderModel {
     this.paymentMethod = '',
     this.paymentMethodTitle,
     this.transactionId,
+    this.paymentUrl,
   });
 
   /// La orden está completada y pagada
@@ -86,6 +88,7 @@ class OrderModel {
       paymentMethod: json['payment_method'] ?? '',
       paymentMethodTitle: json['payment_method_title'],
       transactionId: json['transaction_id'],
+      paymentUrl: json['payment_url'], // URL para completar el pago
     );
   }
 
@@ -143,15 +146,19 @@ class OrderLineItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
+    // Para crear órdenes, WooCommerce solo necesita product_id y quantity
+    // Los demás campos son opcionales y WooCommerce los calcula
+    final json = <String, dynamic>{
       'product_id': productId,
-      'variation_id': variationId,
       'quantity': quantity,
-      'subtotal': subtotal,
-      'total': total,
     };
+
+    // Solo incluir variation_id si existe
+    if (variationId != null && variationId! > 0) {
+      json['variation_id'] = variationId;
+    }
+
+    return json;
   }
 }
 

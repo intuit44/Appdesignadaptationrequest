@@ -29,9 +29,9 @@ final Map<String, String> enUs = {
   "msg_don_t_waste_time":
       "Don’t waste time in\nCOVID-19 pandemic.\nDevelop your skills.",
   "msg_eduvi_is_a_global":
-      "Eduvi is a Global training provider based across the UK that specialises in accredited and bespoke training courses. We crush the barriers togetting a degree.",
+      "Fibro Academy es una plataforma educativa especializada en estética facial, corporal y microblading. Desarrolla tus habilidades con nuestros cursos certificados.",
   "msg_grow_up_your_skills_by":
-      "Grow up your skills\nby online courses\nwith Eduvi",
+      "Desarrolla tus\nhabilidades con\nFibro Academy",
   "msg_high_definition":
       "High-definition video is video of higher resolution and quality than standard definition. While there is no standardized",
   "msg_high_definition2":
@@ -46,19 +46,19 @@ final Map<String, String> enUs = {
   "msg_want_to_share_your_knowledge":
       "Want to share your\nknowledge? Join us\na Mentor",
 
-  // Eduvi online shop One Screen
+  // Fibro Shop Main Screen
   "lbl_40_00": "\$40.00",
   "lbl_all_books": "All Books",
   "lbl_new_arrivals": "New Arrivals",
   "lbl_of_80": "of 80",
-  "msg_eduvi_online_book": "Eduvi Online\nBook Shop",
+  "msg_eduvi_online_book": "Fibro Academy\nOnline Shop",
   "msg_the_three_musketeers2": "The Three Musketeers, by\nAlexandre Dumas",
 
-  // Eduvi online shop Screen
+  // Fibro Shop Screen
   "lbl_all_courses": "All courses",
-  "msg_eduvi_courses_for": "Eduvi Courses\nFor All Standards",
+  "msg_eduvi_courses_for": "Fibro Academy\nCourses For All",
 
-  // Eduvi course details Screen
+  // Fibro Course Details Screen
   "lbl_10_days": "10 Days",
   "lbl_1_57": "1:57",
   "lbl_49_00": "\$49.00",
@@ -107,7 +107,7 @@ final Map<String, String> enUs = {
   "msg_how_to_apply_to": "How to apply to join\nas instructor",
   "msg_instructor_rules": "Instructor Rules",
   "msg_intstructor_requirements": "Intstructor Requirements",
-  "msg_join_eduvi_as_a": "Join Eduvi as\na Mentor",
+  "msg_join_eduvi_as_a": "Join Fibro Academy\nas a Mentor",
   "msg_participate_in_supervised": "Participate in supervised teaching",
   "msg_purse_graduate_studies": "Purse graduate studies",
   "msg_state_teaching_license": "State teaching license",
@@ -130,7 +130,7 @@ final Map<String, String> enUs = {
   "lbl_our_mentors": "Our Mentors",
   "lbl_robert_fox": "Robert Fox",
   "msg_brooklyn_simmons": "Brooklyn Simmons",
-  "msg_eduvi_has_the_qualified": "Eduvi has the\nqualified mentor",
+  "msg_eduvi_has_the_qualified": "Fibro Academy has\nqualified mentors",
   "msg_for_kindergarten": "For kindergarten",
   "msg_home_our_mentors": "Home | Our Mentors",
 
@@ -209,7 +209,7 @@ final Map<String, String> enUs = {
   "lbl_video_courses": "Video Courses",
   "lbl_yes": "Yes",
   "msg_20k_students_daily":
-      "20k+ students daily learn with Eduvi. Subscribe for new courses.",
+      "Join thousands of students learning with Fibro Academy. Subscribe for new courses.",
   "msg_become_an_instructor": "Become An Instructor",
   "msg_classroom_courses": "Classroom courses",
   "msg_e_learning_courses": "E-learning courses",

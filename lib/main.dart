@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'core/app_export.dart';
+import 'data/services/hybrid_auth_service.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -30,11 +31,16 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(themeNotifier);
+
+    // Inicializar servicio híbrido Auth + CRM (escucha cambios automáticamente)
+    // Se activa cuando el usuario se autentica con Firebase
+    ref.watch(hybridAuthProvider);
+
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
           theme: theme,
-          title: 'yellowstone_logistics_llc_s_application2',
+          title: 'Fibro Academy USA',
           builder: (context, child) {
             return MediaQuery(
               data: MediaQuery.of(
@@ -51,7 +57,7 @@ class MyApp extends ConsumerWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('en', '')],
+          supportedLocales: const [Locale('en', ''), Locale('es', '')],
           initialRoute: AppRoutes.initialRoute,
           routes: AppRoutes.routes,
         );
