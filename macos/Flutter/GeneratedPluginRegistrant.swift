@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import cloud_functions
 import connectivity_plus
 import file_selector_macos
 import firebase_auth
@@ -24,6 +25,7 @@ import wakelock_plus
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  FirebaseFunctionsPlugin.register(with: registry.registrar(forPlugin: "FirebaseFunctionsPlugin"))
   ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))

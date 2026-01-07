@@ -1,27 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 /// Servicio para interactuar con el Chatbot de Gemini a través de Cloud Functions
 /// Proporciona respuestas en tiempo real con datos de WooCommerce y Agent CRM
 class GeminiChatService {
-  final Dio _dio;
+  final FirebaseFunctions _functions;
   static GeminiChatService? _instance;
 
   // Historial de conversación para contexto
   List<Map<String, String>> _conversationHistory = [];
 
-  GeminiChatService._()
-      : _dio = Dio(BaseOptions(
-          baseUrl: dotenv.env['FIREBASE_FUNCTIONS_URL'] ??
-              'https://us-central1-eng-gate-453810-h3.cloudfunctions.net',
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 60),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ));
+  GeminiChatService._() : _functions = FirebaseFunctions.instance;
 
   static GeminiChatService get instance {
     _instance ??= GeminiChatService._();
@@ -31,40 +21,29 @@ class GeminiChatService {
   /// Envía un mensaje al chatbot y recibe respuesta
   Future<ChatResponse> sendMessage(String message) async {
     try {
-      final response = await _dio.post(
-        '/chat',
-        data: {
-          'data': {
-            'message': message,
-            'conversationHistory': _conversationHistory,
-          },
-        },
-      );
+      final callable = _functions.httpsCallable('chat');
+      final response = await callable.call<Map<String, dynamic>>({
+        'message': message,
+        'conversationHistory': _conversationHistory,
+      });
 
-      if (response.data != null && response.data['result'] != null) {
-        final result = response.data['result'];
+      final result = response.data;
 
-        // Actualizar historial
-        if (result['conversationHistory'] != null) {
-          _conversationHistory = List<Map<String, String>>.from(
-            (result['conversationHistory'] as List).map(
-              (item) => Map<String, String>.from(item),
-            ),
-          );
-        }
-
-        return ChatResponse(
-          success: result['success'] ?? false,
-          message: result['response'] ?? 'No se pudo obtener respuesta',
+      // Actualizar historial
+      if (result['conversationHistory'] != null) {
+        _conversationHistory = List<Map<String, String>>.from(
+          (result['conversationHistory'] as List).map(
+            (item) => Map<String, String>.from(item),
+          ),
         );
       }
 
       return ChatResponse(
-        success: false,
-        message: 'Error en la respuesta del servidor',
+        success: result['success'] ?? false,
+        message: result['response'] ?? 'No se pudo obtener respuesta',
       );
-    } on DioException catch (e) {
-      debugPrint('GeminiChatService error: ${e.message}');
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint('GeminiChatService error: ${e.code} - ${e.message}');
       return ChatResponse(
         success: false,
         message: _getErrorMessage(e),
@@ -88,14 +67,16 @@ class GeminiChatService {
       List.unmodifiable(_conversationHistory);
 
   /// Mensaje de error amigable
-  String _getErrorMessage(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return 'La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.';
-      case DioExceptionType.connectionError:
-        return 'No se pudo conectar al servidor. Verifica tu conexión a internet.';
+  String _getErrorMessage(FirebaseFunctionsException e) {
+    switch (e.code) {
+      case 'unavailable':
+        return 'El servicio no está disponible. Por favor, intenta más tarde.';
+      case 'deadline-exceeded':
+        return 'La conexión tardó demasiado. Por favor, intenta de nuevo.';
+      case 'internal':
+        return 'Error interno del servidor. Por favor, intenta más tarde.';
+      case 'unauthenticated':
+        return 'Sesión no válida. Por favor, inicia sesión de nuevo.';
       default:
         return 'Error de conexión. Por favor, intenta de nuevo.';
     }
