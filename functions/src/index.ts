@@ -280,7 +280,9 @@ RESTRICCIONES:
  * Cloud Function principal para el chatbot
  * Recibe mensajes y responde usando Gemini con Function Calling
  */
-export const chat = onCall(async (request: CallableRequest<ChatRequest>) => {
+export const chat = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<ChatRequest>) => {
   const { message, conversationHistory = [] } = request.data;
 
   if (!message) {
@@ -373,7 +375,9 @@ export const chat = onCall(async (request: CallableRequest<ChatRequest>) => {
 /**
  * Cloud Function para obtener productos (acceso directo sin chat)
  */
-export const getProducts = onCall(async (request: CallableRequest<ProductsRequest>) => {
+export const getProducts = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<ProductsRequest>) => {
   const { category, search, limit } = request.data;
 
   try {
@@ -388,7 +392,9 @@ export const getProducts = onCall(async (request: CallableRequest<ProductsReques
 /**
  * Cloud Function para obtener cursos (acceso directo sin chat)
  */
-export const getCourses = onCall(async (request: CallableRequest<CoursesRequest>) => {
+export const getCourses = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<CoursesRequest>) => {
   const { category, search, limit } = request.data;
 
   try {
