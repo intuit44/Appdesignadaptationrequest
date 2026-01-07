@@ -21,6 +21,7 @@ import '../presentation/product_detail_screen/product_detail_screen.dart';
 import '../presentation/settings_screen/settings_screen.dart';
 import '../presentation/tutorials_screen/tutorials_screen.dart';
 import '../presentation/wishlist_screen/wishlist_screen.dart';
+import '../presentation/chatbot_screen/chatbot_screen.dart';
 import '../data/models/product_model.dart';
 
 // ignore_for_file: must_be_immutable
@@ -76,6 +77,7 @@ class AppRoutes {
   static const String settingsScreen = '/settings_screen';
   static const String helpScreen = '/help_screen';
   static const String tutorialsScreen = '/tutorials_screen';
+  static const String chatbotScreen = '/chatbot_screen';
 
   static const String initialRoute = '/initialRoute';
 
@@ -101,6 +103,7 @@ class AppRoutes {
     settingsScreen: (context) => const SettingsScreen(),
     helpScreen: (context) => const HelpScreen(),
     tutorialsScreen: (context) => const TutorialsScreen(),
+    chatbotScreen: (context) => const ChatbotScreen(),
     initialRoute: (context) => const MainScreen(),
   };
 

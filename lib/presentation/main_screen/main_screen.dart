@@ -69,6 +69,24 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ],
       ),
       bottomNavigationBar: _buildBottomNavBar(),
+      // Botón flotante del chatbot
+      floatingActionButton: _buildChatbotFAB(),
+    );
+  }
+
+  /// Botón flotante para acceder al chatbot de Gemini
+  Widget _buildChatbotFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.pushNamed(context, AppRoutes.chatbotScreen);
+      },
+      backgroundColor: appTheme.deepOrange400,
+      elevation: 4,
+      child: const Icon(
+        Icons.smart_toy_outlined,
+        color: Colors.white,
+        size: 28,
+      ),
     );
   }
 
