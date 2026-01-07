@@ -116,6 +116,36 @@ class CourseModel {
     );
   }
 
+  /// Factory para datos de Cloud Functions (formato simplificado)
+  factory CourseModel.fromCloudFunction(Map<String, dynamic> json) {
+    return CourseModel(
+      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      name: json['name'] ?? '',
+      slug: json['slug'] ??
+          json['name']?.toString().toLowerCase().replaceAll(' ', '-') ??
+          '',
+      price: json['price']?.toString() ?? '0',
+      description: json['description'] ?? '',
+      shortDescription: json['description'] ?? '',
+      duration: json['duration'],
+      instructor: json['instructor'],
+      rating: double.tryParse(json['rating']?.toString() ?? ''),
+      images: json['image'] != null
+          ? [CourseImage(id: 0, src: json['image'], name: '', alt: '')]
+          : [],
+      categories: json['category'] != null
+          ? [
+              CourseCategory(
+                  id: 0,
+                  name: json['category'],
+                  slug: json['category'].toString().toLowerCase())
+            ]
+          : [],
+      whatYouLearn:
+          json['topics'] != null ? List<String>.from(json['topics']) : null,
+    );
+  }
+
   static String? _extractMeta(List<dynamic>? metaData, String key) {
     if (metaData == null) return null;
     final meta = metaData.firstWhere(

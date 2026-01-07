@@ -92,6 +92,24 @@ class OrderModel {
     );
   }
 
+  /// Factory para datos de Cloud Functions (formato simplificado)
+  factory OrderModel.fromCloudFunction(Map<String, dynamic> json) {
+    return OrderModel(
+      id: json['id'] ?? 0,
+      orderNumber: json['id']?.toString() ?? '0',
+      status: json['status'] ?? 'pending',
+      currency: json['currency'] ?? 'USD',
+      total: json['total']?.toString() ?? '0',
+      dateCreated: json['dateCreated'] != null
+          ? DateTime.tryParse(json['dateCreated'])
+          : null,
+      lineItems: (json['lineItems'] as List<dynamic>?)
+              ?.map((e) => OrderLineItem.fromCloudFunction(e))
+              .toList() ??
+          [],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -142,6 +160,17 @@ class OrderLineItem {
       total: json['total']?.toString() ?? '0',
       sku: json['sku'],
       image: json['image']?['src'],
+    );
+  }
+
+  factory OrderLineItem.fromCloudFunction(Map<String, dynamic> json) {
+    return OrderLineItem(
+      id: 0,
+      name: json['name'] ?? '',
+      productId: 0,
+      quantity: json['quantity'] ?? 1,
+      subtotal: json['total']?.toString() ?? '0',
+      total: json['total']?.toString() ?? '0',
     );
   }
 

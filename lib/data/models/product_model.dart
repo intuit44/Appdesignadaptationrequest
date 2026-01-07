@@ -213,6 +213,44 @@ class ProductModel {
     );
   }
 
+  /// Factory para datos de Cloud Functions (formato simplificado)
+  factory ProductModel.fromCloudFunction(Map<String, dynamic> json) {
+    // Cloud Functions devuelve categorías como lista de strings
+    final categoriesData = json['categories'];
+    List<ProductCategory> categories = [];
+    if (categoriesData is List) {
+      categories = categoriesData.map((c) {
+        if (c is String) {
+          return ProductCategory(id: 0, name: c, slug: c.toLowerCase().replaceAll(' ', '-'));
+        } else if (c is Map) {
+          return ProductCategory.fromJson(c as Map<String, dynamic>);
+        }
+        return ProductCategory(id: 0, name: '', slug: '');
+      }).toList();
+    }
+
+    return ProductModel(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? json['name']?.toString().toLowerCase().replaceAll(' ', '-') ?? '',
+      price: json['price']?.toString() ?? '0',
+      regularPrice: json['regular_price']?.toString(),
+      salePrice: json['sale_price']?.toString(),
+      onSale: json['on_sale'] ?? false,
+      featured: json['featured'] ?? false,
+      description: json['description'] ?? '',
+      shortDescription: json['description'] ?? '',
+      stockStatus: json['stock_status'] ?? 'instock',
+      stockQuantity: json['stock_quantity'],
+      averageRating: json['rating']?.toString() ?? '0',
+      ratingCount: json['rating_count'] ?? 0,
+      categories: categories,
+      images: json['image'] != null 
+          ? [ProductImage(id: 0, src: json['image'], name: '', alt: '')]
+          : [],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -296,14 +334,28 @@ class ProductCategory {
   final int id;
   final String name;
   final String? slug;
+  final int? count;
+  final String? image;
 
-  ProductCategory({required this.id, required this.name, this.slug});
+  ProductCategory({required this.id, required this.name, this.slug, this.count, this.image});
 
   factory ProductCategory.fromJson(Map<String, dynamic> json) {
     return ProductCategory(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       slug: json['slug'],
+      count: json['count'],
+      image: json['image']?['src'],
+    );
+  }
+
+  factory ProductCategory.fromCloudFunction(Map<String, dynamic> json) {
+    return ProductCategory(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      count: json['count'] ?? 0,
+      image: json['image'],
     );
   }
 

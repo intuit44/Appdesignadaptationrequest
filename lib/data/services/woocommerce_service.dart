@@ -1,19 +1,32 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/network/api_client.dart';
 import '../../core/network/api_endpoints.dart';
 import '../models/product_model.dart';
 import '../models/course_model.dart';
 import '../models/order_model.dart';
 import '../models/user_model.dart';
 
-/// Servicio para interactuar con WooCommerce REST API
-/// Maneja productos, cursos, órdenes y clientes
+/// Servicio para interactuar con Cloud Functions
+/// Todas las llamadas pasan por el backend de Firebase
 class WooCommerceService {
-  final ApiClient _apiClient;
+  final Dio _dio;
 
-  WooCommerceService({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient.instance;
+  WooCommerceService({Dio? dio})
+      : _dio = dio ??
+            Dio(BaseOptions(
+              connectTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 60),
+              headers: {'Content-Type': 'application/json'},
+            ));
+
+  /// Extrae el resultado de la respuesta de Cloud Functions
+  Map<String, dynamic> _extractResult(dynamic data) {
+    if (data is Map) {
+      return Map<String, dynamic>.from(data['result'] ?? data);
+    }
+    return {};
+  }
 
   // ==================== Productos ====================
 
@@ -28,26 +41,21 @@ class WooCommerceService {
     bool? featured,
     bool? onSale,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'per_page': perPage,
-      'orderby': orderBy,
-      'order': order,
-    };
-
-    if (category != null) queryParams['category'] = category;
-    if (search != null) queryParams['search'] = search;
-    if (featured != null) queryParams['featured'] = featured;
-    if (onSale != null) queryParams['on_sale'] = onSale;
-
-    final response = await _apiClient.get(
-      ApiEndpoints.products,
-      queryParameters: queryParams,
+    final response = await _dio.post(
+      ApiEndpoints.cfGetProducts,
+      data: {
+        'data': {
+          if (category != null) 'category': category,
+          if (search != null) 'search': search,
+          'limit': perPage,
+        },
+      },
     );
 
-    if (response.data is List) {
-      return (response.data as List)
-          .map((json) => ProductModel.fromJson(json))
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['products'] != null) {
+      return (result['products'] as List)
+          .map((json) => ProductModel.fromCloudFunction(json))
           .toList();
     }
     return [];
@@ -55,9 +63,16 @@ class WooCommerceService {
 
   /// Obtiene un producto por ID
   Future<ProductModel?> getProductById(int id) async {
-    final response = await _apiClient.get(ApiEndpoints.productById(id));
-    if (response.data != null) {
-      return ProductModel.fromJson(response.data);
+    final response = await _dio.post(
+      ApiEndpoints.cfGetProductDetail,
+      data: {
+        'data': {'productId': id},
+      },
+    );
+
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['product'] != null) {
+      return ProductModel.fromCloudFunction(result['product']);
     }
     return null;
   }
@@ -74,8 +89,7 @@ class WooCommerceService {
 
   // ==================== Cursos ====================
 
-  /// Obtiene cursos (productos de categoría específica)
-  /// Asume que los cursos están en una categoría "cursos" o similar
+  /// Obtiene cursos
   Future<List<CourseModel>> getCourses({
     int page = 1,
     int perPage = 20,
@@ -85,26 +99,21 @@ class WooCommerceService {
     String order = 'desc',
     bool? featured,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'per_page': perPage,
-      'orderby': orderBy,
-      'order': order,
-      // Filtrar por categoría de cursos si no se especifica otra
-      if (categorySlug != null) 'category': categorySlug,
-    };
-
-    if (search != null) queryParams['search'] = search;
-    if (featured != null) queryParams['featured'] = featured;
-
-    final response = await _apiClient.get(
-      ApiEndpoints.products,
-      queryParameters: queryParams,
+    final response = await _dio.post(
+      ApiEndpoints.cfGetCourses,
+      data: {
+        'data': {
+          if (categorySlug != null) 'category': categorySlug,
+          if (search != null) 'search': search,
+          'limit': perPage,
+        },
+      },
     );
 
-    if (response.data is List) {
-      return (response.data as List)
-          .map((json) => CourseModel.fromJson(json))
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['courses'] != null) {
+      return (result['courses'] as List)
+          .map((json) => CourseModel.fromCloudFunction(json))
           .toList();
     }
     return [];
@@ -112,9 +121,16 @@ class WooCommerceService {
 
   /// Obtiene un curso por ID
   Future<CourseModel?> getCourseById(int id) async {
-    final response = await _apiClient.get(ApiEndpoints.productById(id));
-    if (response.data != null) {
-      return CourseModel.fromJson(response.data);
+    final response = await _dio.post(
+      ApiEndpoints.cfGetCourseDetail,
+      data: {
+        'data': {'courseId': id.toString()},
+      },
+    );
+
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['course'] != null) {
+      return CourseModel.fromCloudFunction(result['course']);
     }
     return null;
   }
@@ -133,22 +149,19 @@ class WooCommerceService {
     int? parent,
     bool hideEmpty = true,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'per_page': perPage,
-      'hide_empty': hideEmpty,
-    };
-
-    if (parent != null) queryParams['parent'] = parent;
-
-    final response = await _apiClient.get(
-      ApiEndpoints.productCategories,
-      queryParameters: queryParams,
+    final response = await _dio.post(
+      ApiEndpoints.cfGetCategories,
+      data: {
+        'data': {
+          if (parent != null) 'parent': parent,
+        },
+      },
     );
 
-    if (response.data is List) {
-      return (response.data as List)
-          .map((json) => ProductCategory.fromJson(json))
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['categories'] != null) {
+      return (result['categories'] as List)
+          .map((json) => ProductCategory.fromCloudFunction(json))
           .toList();
     }
     return [];
@@ -156,29 +169,30 @@ class WooCommerceService {
 
   // ==================== Órdenes ====================
 
-  /// Obtiene todas las órdenes (para admin) o las del cliente si se especifica customerId
+  /// Obtiene órdenes de un cliente
   Future<List<OrderModel>> getOrders({
     int? customerId,
     int page = 1,
     int perPage = 20,
     String? status,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'per_page': perPage,
-    };
+    if (customerId == null) return [];
 
-    if (customerId != null) queryParams['customer'] = customerId;
-    if (status != null) queryParams['status'] = status;
-
-    final response = await _apiClient.get(
-      ApiEndpoints.orders,
-      queryParameters: queryParams,
+    final response = await _dio.post(
+      ApiEndpoints.cfGetOrders,
+      data: {
+        'data': {
+          'customerId': customerId,
+          'page': page,
+          'limit': perPage,
+        },
+      },
     );
 
-    if (response.data is List) {
-      return (response.data as List)
-          .map((json) => OrderModel.fromJson(json))
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['orders'] != null) {
+      return (result['orders'] as List)
+          .map((json) => OrderModel.fromCloudFunction(json))
           .toList();
     }
     return [];
@@ -193,25 +207,25 @@ class WooCommerceService {
     bool setPaid = false,
     BillingAddress? billing,
   }) async {
-    final data = <String, dynamic>{
-      'customer_id': customerId,
-      'line_items': lineItems.map((item) => item.toJson()).toList(),
-      'set_paid': setPaid,
-    };
-
-    if (paymentMethod != null) data['payment_method'] = paymentMethod;
-    if (paymentMethodTitle != null) {
-      data['payment_method_title'] = paymentMethodTitle;
-    }
-    if (billing != null) data['billing'] = billing.toJson();
-
-    final response = await _apiClient.post(
-      ApiEndpoints.orders,
-      data: data,
+    final response = await _dio.post(
+      ApiEndpoints.cfCreateOrder,
+      data: {
+        'data': {
+          'customerId': customerId,
+          'lineItems': lineItems
+              .map((item) => {
+                    'productId': item.productId,
+                    'quantity': item.quantity,
+                  })
+              .toList(),
+          if (billing != null) 'billing': billing.toJson(),
+        },
+      },
     );
 
-    if (response.statusCode == 201 && response.data != null) {
-      return OrderModel.fromJson(response.data);
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['order'] != null) {
+      return OrderModel.fromCloudFunction(result['order']);
     }
     return null;
   }
@@ -223,58 +237,52 @@ class WooCommerceService {
     int perPage = 20,
     String? status,
   }) async {
-    final queryParams = <String, dynamic>{
-      'customer': customerId,
-      'page': page,
-      'per_page': perPage,
-    };
-
-    if (status != null) queryParams['status'] = status;
-
-    final response = await _apiClient.get(
-      ApiEndpoints.orders,
-      queryParameters: queryParams,
-    );
-
-    if (response.data is List) {
-      return (response.data as List)
-          .map((json) => OrderModel.fromJson(json))
-          .toList();
-    }
-    return [];
+    return getOrders(
+        customerId: customerId, page: page, perPage: perPage, status: status);
   }
 
-  /// Obtiene una orden por ID
+  /// Obtiene una orden por ID (usa getOrders y filtra)
   Future<OrderModel?> getOrderById(int id) async {
-    final response = await _apiClient.get(ApiEndpoints.orderById(id));
-    if (response.data != null) {
-      return OrderModel.fromJson(response.data);
-    }
+    // Cloud Functions no tiene endpoint específico, se implementaría si es necesario
     return null;
   }
 
-  /// Actualiza el estado de una orden
+  /// Actualiza el estado de una orden (no disponible via Cloud Functions aún)
   Future<OrderModel?> updateOrderStatus(int orderId, String status) async {
-    final response = await _apiClient.put(
-      ApiEndpoints.orderById(orderId),
-      data: {'status': status},
-    );
-
-    if (response.data != null) {
-      return OrderModel.fromJson(response.data);
-    }
     return null;
   }
 
   // ==================== Clientes ====================
 
-  /// Obtiene información de un cliente
-  Future<UserModel?> getCustomer(int id) async {
-    final response = await _apiClient.get(ApiEndpoints.customerById(id));
-    if (response.data != null) {
-      return UserModel.fromJson(response.data);
+  /// Obtiene o crea un cliente
+  Future<UserModel?> getOrCreateCustomer({
+    required String email,
+    String? firstName,
+    String? lastName,
+    Map<String, String>? billing,
+  }) async {
+    final response = await _dio.post(
+      ApiEndpoints.cfGetOrCreateCustomer,
+      data: {
+        'data': {
+          'email': email,
+          if (firstName != null) 'firstName': firstName,
+          if (lastName != null) 'lastName': lastName,
+          if (billing != null) 'billing': billing,
+        },
+      },
+    );
+
+    final result = _extractResult(response.data);
+    if (result['success'] == true && result['customer'] != null) {
+      return UserModel.fromCloudFunction(result['customer']);
     }
     return null;
+  }
+
+  /// Obtiene información de un cliente (usa getOrCreateCustomer)
+  Future<UserModel?> getCustomer(int id) async {
+    return null; // No hay endpoint directo por ID
   }
 
   /// Crea un nuevo cliente
@@ -285,27 +293,14 @@ class WooCommerceService {
     String? lastName,
     String? phone,
   }) async {
-    final data = <String, dynamic>{
-      'email': email,
-    };
-
-    if (password != null) data['password'] = password;
-    if (firstName != null) data['first_name'] = firstName;
-    if (lastName != null) data['last_name'] = lastName;
-    if (phone != null) data['billing'] = {'phone': phone};
-
-    final response = await _apiClient.post(
-      ApiEndpoints.customers,
-      data: data,
+    return getOrCreateCustomer(
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
     );
-
-    if (response.statusCode == 201 && response.data != null) {
-      return UserModel.fromJson(response.data);
-    }
-    return null;
   }
 
-  /// Actualiza información del cliente
+  /// Actualiza información del cliente (no disponible aún)
   Future<UserModel?> updateCustomer(
     int id, {
     String? firstName,
@@ -313,44 +308,18 @@ class WooCommerceService {
     String? phone,
     BillingAddress? billing,
   }) async {
-    final data = <String, dynamic>{};
-
-    if (firstName != null) data['first_name'] = firstName;
-    if (lastName != null) data['last_name'] = lastName;
-    if (phone != null) data['billing'] = {'phone': phone};
-    if (billing != null) data['billing'] = billing.toJson();
-
-    if (data.isEmpty) return null;
-
-    final response = await _apiClient.put(
-      ApiEndpoints.customerById(id),
-      data: data,
-    );
-
-    if (response.data != null) {
-      return UserModel.fromJson(response.data);
-    }
     return null;
   }
 
   /// Busca cliente por email
   Future<UserModel?> findCustomerByEmail(String email) async {
-    final response = await _apiClient.get(
-      ApiEndpoints.customers,
-      queryParameters: {'email': email},
-    );
-
-    if (response.data is List && (response.data as List).isNotEmpty) {
-      return UserModel.fromJson((response.data as List).first);
-    }
-    return null;
+    return getOrCreateCustomer(email: email);
   }
 
-  // ==================== Carrito (usando órdenes pendientes) ====================
+  // ==================== Carrito ====================
 
   /// Obtiene o crea orden pendiente como carrito
   Future<OrderModel?> getOrCreateCart(int customerId) async {
-    // Buscar orden pendiente existente
     final pendingOrders = await getCustomerOrders(
       customerId: customerId,
       status: 'pending',
@@ -361,61 +330,18 @@ class WooCommerceService {
       return pendingOrders.first;
     }
 
-    // Crear nueva orden pendiente como carrito
     return createOrder(
       customerId: customerId,
       lineItems: [],
     );
   }
 
-  /// Agrega item al carrito
+  /// Agrega item al carrito (no implementado aún via Cloud Functions)
   Future<OrderModel?> addToCart({
     required int orderId,
     required int productId,
     int quantity = 1,
   }) async {
-    final order = await getOrderById(orderId);
-    if (order == null) return null;
-
-    final lineItems = order.lineItems.toList();
-
-    // Verificar si el producto ya está en el carrito
-    final existingIndex =
-        lineItems.indexWhere((item) => item.productId == productId);
-
-    if (existingIndex >= 0) {
-      // Actualizar cantidad - crear nuevo item con cantidad actualizada
-      final existing = lineItems[existingIndex];
-      lineItems[existingIndex] = OrderLineItem(
-        id: existing.id,
-        name: existing.name,
-        productId: existing.productId,
-        quantity: existing.quantity + quantity,
-        subtotal: existing.subtotal,
-        total: existing.total,
-      );
-    } else {
-      // Agregar nuevo item (se completará con datos del producto al guardar)
-      lineItems.add(OrderLineItem(
-        id: 0,
-        name: '',
-        productId: productId,
-        quantity: quantity,
-        subtotal: '0',
-        total: '0',
-      ));
-    }
-
-    final response = await _apiClient.put(
-      ApiEndpoints.orderById(orderId),
-      data: {
-        'line_items': lineItems.map((item) => item.toJson()).toList(),
-      },
-    );
-
-    if (response.data != null) {
-      return OrderModel.fromJson(response.data);
-    }
     return null;
   }
 }

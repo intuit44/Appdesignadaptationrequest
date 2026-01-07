@@ -372,16 +372,62 @@ export const chat = onCall(
   }
 });
 
+// ==================== INTERFACES ADICIONALES ====================
+
+interface ProductDetailRequest {
+  productId?: number;
+  productSlug?: string;
+}
+
+interface CategoryRequest {
+  parent?: number;
+}
+
+interface OrderRequest {
+  customerId?: number;
+  page?: number;
+  limit?: number;
+}
+
+interface CreateOrderRequest {
+  customerId: number;
+  lineItems: Array<{
+    productId: number;
+    quantity: number;
+    variationId?: number;
+  }>;
+  billing?: Record<string, string>;
+  shipping?: Record<string, string>;
+}
+
+interface CustomerRequest {
+  email?: string;
+  customerId?: number;
+}
+
+interface CreateCustomerRequest {
+  email: string;
+  firstName: string;
+  lastName: string;
+  billing?: Record<string, string>;
+}
+
+// ==================== PRODUCTOS ====================
+
 /**
- * Cloud Function para obtener productos (acceso directo sin chat)
+ * Cloud Function para obtener productos
  */
 export const getProducts = onCall(
   { enforceAppCheck: false },
   async (request: CallableRequest<ProductsRequest>) => {
-  const { category, search, limit } = request.data;
+  const { category, search, limit = 20 } = request.data || {};
 
   try {
-    const products = await wooCommerce.getProducts({ category, search, limit });
+    const products = await wooCommerce.getProducts({ 
+      category, 
+      search, 
+      limit 
+    });
     return { success: true, products };
   } catch (error) {
     console.error("Error obteniendo productos:", error);
@@ -390,12 +436,76 @@ export const getProducts = onCall(
 });
 
 /**
- * Cloud Function para obtener cursos (acceso directo sin chat)
+ * Cloud Function para obtener detalle de un producto
+ */
+export const getProductDetail = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<ProductDetailRequest>) => {
+  const { productId, productSlug } = request.data || {};
+
+  try {
+    let product;
+    if (productId) {
+      product = await wooCommerce.getProductById(productId);
+    } else if (productSlug) {
+      product = await wooCommerce.searchProduct(productSlug);
+    } else {
+      throw new HttpsError("invalid-argument", "Se requiere productId o productSlug");
+    }
+    return { success: true, product };
+  } catch (error) {
+    console.error("Error obteniendo producto:", error);
+    throw new HttpsError("internal", "Error obteniendo producto");
+  }
+});
+
+/**
+ * Cloud Function para obtener categorías de productos
+ */
+export const getCategories = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<CategoryRequest>) => {
+  const { parent } = request.data || {};
+
+  try {
+    const categories = await wooCommerce.getCategories(parent);
+    return { success: true, categories };
+  } catch (error) {
+    console.error("Error obteniendo categorías:", error);
+    throw new HttpsError("internal", "Error obteniendo categorías");
+  }
+});
+
+/**
+ * Cloud Function para verificar disponibilidad de producto
+ */
+export const checkAvailability = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<ProductDetailRequest>) => {
+  const { productId } = request.data || {};
+
+  if (!productId) {
+    throw new HttpsError("invalid-argument", "Se requiere productId");
+  }
+
+  try {
+    const availability = await wooCommerce.checkAvailability(productId);
+    return { success: true, availability };
+  } catch (error) {
+    console.error("Error verificando disponibilidad:", error);
+    throw new HttpsError("internal", "Error verificando disponibilidad");
+  }
+});
+
+// ==================== CURSOS ====================
+
+/**
+ * Cloud Function para obtener cursos
  */
 export const getCourses = onCall(
   { enforceAppCheck: false },
   async (request: CallableRequest<CoursesRequest>) => {
-  const { category, search, limit } = request.data;
+  const { category, search, limit = 20 } = request.data || {};
 
   try {
     const courses = await agentCRM.getCourses({ category, search, limit });
@@ -405,3 +515,152 @@ export const getCourses = onCall(
     throw new HttpsError("internal", "Error obteniendo cursos");
   }
 });
+
+/**
+ * Cloud Function para obtener detalle de un curso
+ */
+export const getCourseDetail = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<{ courseId?: string; courseName?: string }>) => {
+  const { courseId, courseName } = request.data || {};
+
+  try {
+    let course;
+    if (courseId) {
+      course = await agentCRM.getCourseById(courseId);
+    } else if (courseName) {
+      course = await agentCRM.searchCourse(courseName);
+    } else {
+      throw new HttpsError("invalid-argument", "Se requiere courseId o courseName");
+    }
+    return { success: true, course };
+  } catch (error) {
+    console.error("Error obteniendo curso:", error);
+    throw new HttpsError("internal", "Error obteniendo curso");
+  }
+});
+
+/**
+ * Cloud Function para obtener próximos eventos
+ */
+export const getUpcomingEvents = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<{ limit?: number }>) => {
+  const { limit = 10 } = request.data || {};
+
+  try {
+    const events = await agentCRM.getUpcomingEvents(limit);
+    return { success: true, events };
+  } catch (error) {
+    console.error("Error obteniendo eventos:", error);
+    throw new HttpsError("internal", "Error obteniendo eventos");
+  }
+});
+
+// ==================== ÓRDENES ====================
+
+/**
+ * Cloud Function para obtener órdenes de un cliente
+ */
+export const getOrders = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<OrderRequest>) => {
+  const { customerId, page = 1, limit = 10 } = request.data || {};
+
+  if (!customerId) {
+    throw new HttpsError("invalid-argument", "Se requiere customerId");
+  }
+
+  try {
+    const orders = await wooCommerce.getOrders(customerId, page, limit);
+    return { success: true, orders };
+  } catch (error) {
+    console.error("Error obteniendo órdenes:", error);
+    throw new HttpsError("internal", "Error obteniendo órdenes");
+  }
+});
+
+/**
+ * Cloud Function para crear una orden
+ */
+export const createOrder = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<CreateOrderRequest>) => {
+  const { customerId, lineItems, billing, shipping } = request.data || {};
+
+  if (!lineItems || lineItems.length === 0) {
+    throw new HttpsError("invalid-argument", "Se requieren productos en la orden");
+  }
+
+  try {
+    const order = await wooCommerce.createOrder({
+      customerId,
+      lineItems,
+      billing,
+      shipping,
+    });
+    return { success: true, order };
+  } catch (error) {
+    console.error("Error creando orden:", error);
+    throw new HttpsError("internal", "Error creando orden");
+  }
+});
+
+// ==================== CLIENTES ====================
+
+/**
+ * Cloud Function para obtener o crear cliente
+ */
+export const getOrCreateCustomer = onCall(
+  { enforceAppCheck: false },
+  async (request: CallableRequest<CreateCustomerRequest>) => {
+  const { email, firstName, lastName, billing } = request.data || {};
+
+  if (!email) {
+    throw new HttpsError("invalid-argument", "Se requiere email");
+  }
+
+  try {
+    // Primero buscar si existe
+    let customer = await wooCommerce.getCustomerByEmail(email);
+    
+    if (!customer && firstName && lastName) {
+      // Crear nuevo cliente
+      customer = await wooCommerce.createCustomer({
+        email,
+        firstName,
+        lastName,
+        billing,
+      });
+    }
+    
+    return { success: true, customer };
+  } catch (error) {
+    console.error("Error con cliente:", error);
+    throw new HttpsError("internal", "Error procesando cliente");
+  }
+});
+
+/**
+ * Cloud Function para obtener información de contacto
+ */
+export const getContactInfo = onCall(
+  { enforceAppCheck: false },
+  async () => {
+  return {
+    success: true,
+    contact: {
+      nombre: "Fibro Academy USA",
+      direccion: "2684 NW 97th Ave, Doral, FL 33172",
+      telefono: "(305) 632-4630",
+      email: "hello@fibroacademyusa.com",
+      website: "https://fibroacademyusa.com",
+      horario: "Lunes a Viernes: 9:00 AM - 6:00 PM, Sábados: 10:00 AM - 2:00 PM",
+      redes_sociales: {
+        instagram: "@fibroacademyusa",
+        facebook: "FibroAcademyUSA",
+      },
+    },
+  };
+});
+

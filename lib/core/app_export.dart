@@ -12,5 +12,8 @@ export 'package:yellowstone_logistics_llc_s_application2/theme/theme_helper.dart
 export 'package:yellowstone_logistics_llc_s_application2/widgets/custom_image_view.dart';
 export 'package:yellowstone_logistics_llc_s_application2/theme/notifier/theme_notifier.dart';
 
+// Cloud Functions Service (Backend centralizado)
+export 'package:yellowstone_logistics_llc_s_application2/data/services/cloud_functions_service.dart';
+
 // CRM Providers (Agent CRM Pro)
 export 'package:yellowstone_logistics_llc_s_application2/core/providers/crm_providers.dart';

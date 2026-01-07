@@ -66,6 +66,16 @@ class UserModel {
     return json['avatar_url'];
   }
 
+  /// Factory para datos de Cloud Functions (formato simplificado)
+  factory UserModel.fromCloudFunction(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] ?? 0,
+      email: json['email'] ?? '',
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

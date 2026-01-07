@@ -185,6 +185,208 @@ export class WooCommerceAPI {
   }
 
   /**
+   * Obtiene categorías de productos
+   */
+  async getCategories(parent?: number): Promise<Array<{
+    id: number;
+    name: string;
+    slug: string;
+    count: number;
+    image: string | null;
+  }>> {
+    try {
+      const params: Record<string, unknown> = {
+        per_page: 100,
+        hide_empty: true,
+      };
+
+      if (parent !== undefined) {
+        params.parent = parent;
+      }
+
+      const response = await this.client.get("/products/categories", { params });
+
+      return response.data.map((cat: {
+        id: number;
+        name: string;
+        slug: string;
+        count: number;
+        image?: { src: string };
+      }) => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        count: cat.count,
+        image: cat.image?.src || null,
+      }));
+    } catch (error) {
+      console.error("WooCommerce getCategories error:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Obtiene órdenes de un cliente
+   */
+  async getOrders(customerId: number, page = 1, limit = 10): Promise<Array<{
+    id: number;
+    status: string;
+    total: string;
+    currency: string;
+    dateCreated: string;
+    lineItems: Array<{ name: string; quantity: number; total: string }>;
+  }>> {
+    try {
+      const response = await this.client.get("/orders", {
+        params: {
+          customer: customerId,
+          page,
+          per_page: limit,
+          orderby: "date",
+          order: "desc",
+        },
+      });
+
+      return response.data.map((order: {
+        id: number;
+        status: string;
+        total: string;
+        currency: string;
+        date_created: string;
+        line_items: Array<{ name: string; quantity: number; total: string }>;
+      }) => ({
+        id: order.id,
+        status: order.status,
+        total: order.total,
+        currency: order.currency,
+        dateCreated: order.date_created,
+        lineItems: order.line_items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          total: item.total,
+        })),
+      }));
+    } catch (error) {
+      console.error("WooCommerce getOrders error:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Crea una nueva orden
+   */
+  async createOrder(data: {
+    customerId?: number;
+    lineItems: Array<{
+      productId: number;
+      quantity: number;
+      variationId?: number;
+    }>;
+    billing?: Record<string, string>;
+    shipping?: Record<string, string>;
+  }): Promise<{ id: number; status: string; total: string } | null> {
+    try {
+      const orderData: Record<string, unknown> = {
+        payment_method: "cod",
+        payment_method_title: "Pago en la app",
+        set_paid: false,
+        line_items: data.lineItems.map((item) => ({
+          product_id: item.productId,
+          quantity: item.quantity,
+          ...(item.variationId && { variation_id: item.variationId }),
+        })),
+      };
+
+      if (data.customerId) {
+        orderData.customer_id = data.customerId;
+      }
+
+      if (data.billing) {
+        orderData.billing = data.billing;
+      }
+
+      if (data.shipping) {
+        orderData.shipping = data.shipping;
+      }
+
+      const response = await this.client.post("/orders", orderData);
+
+      return {
+        id: response.data.id,
+        status: response.data.status,
+        total: response.data.total,
+      };
+    } catch (error) {
+      console.error("WooCommerce createOrder error:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Busca cliente por email
+   */
+  async getCustomerByEmail(email: string): Promise<{
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+  } | null> {
+    try {
+      const response = await this.client.get("/customers", {
+        params: { email },
+      });
+
+      if (response.data.length > 0) {
+        const customer = response.data[0];
+        return {
+          id: customer.id,
+          email: customer.email,
+          firstName: customer.first_name,
+          lastName: customer.last_name,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error("WooCommerce getCustomerByEmail error:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Crea un nuevo cliente
+   */
+  async createCustomer(data: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    billing?: Record<string, string>;
+  }): Promise<{
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+  } | null> {
+    try {
+      const response = await this.client.post("/customers", {
+        email: data.email,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        billing: data.billing || {},
+      });
+
+      return {
+        id: response.data.id,
+        email: response.data.email,
+        firstName: response.data.first_name,
+        lastName: response.data.last_name,
+      };
+    } catch (error) {
+      console.error("WooCommerce createCustomer error:", error);
+      return null;
+    }
+  }
+
+  /**
    * Obtiene el ID de categoría por su slug
    */
   private async getCategoryIdBySlug(slug: string): Promise<number | null> {

@@ -4,7 +4,7 @@
  * Integración de Gemini AI con datos en tiempo real de WooCommerce y Agent CRM
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCourses = exports.getProducts = exports.chat = void 0;
+exports.getContactInfo = exports.getOrCreateCustomer = exports.createOrder = exports.getOrders = exports.getUpcomingEvents = exports.getCourseDetail = exports.getCourses = exports.checkAvailability = exports.getCategories = exports.getProductDetail = exports.getProducts = exports.chat = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const vertexai_1 = require("@google-cloud/vertexai");
@@ -311,13 +311,18 @@ exports.chat = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) =
         throw new https_1.HttpsError("internal", "Error procesando el mensaje");
     }
 });
+// ==================== PRODUCTOS ====================
 /**
- * Cloud Function para obtener productos (acceso directo sin chat)
+ * Cloud Function para obtener productos
  */
 exports.getProducts = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
-    const { category, search, limit } = request.data;
+    const { category, search, limit = 20 } = request.data || {};
     try {
-        const products = await wooCommerce.getProducts({ category, search, limit });
+        const products = await wooCommerce.getProducts({
+            category,
+            search,
+            limit
+        });
         return { success: true, products };
     }
     catch (error) {
@@ -326,10 +331,65 @@ exports.getProducts = (0, https_1.onCall)({ enforceAppCheck: false }, async (req
     }
 });
 /**
- * Cloud Function para obtener cursos (acceso directo sin chat)
+ * Cloud Function para obtener detalle de un producto
+ */
+exports.getProductDetail = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { productId, productSlug } = request.data || {};
+    try {
+        let product;
+        if (productId) {
+            product = await wooCommerce.getProductById(productId);
+        }
+        else if (productSlug) {
+            product = await wooCommerce.searchProduct(productSlug);
+        }
+        else {
+            throw new https_1.HttpsError("invalid-argument", "Se requiere productId o productSlug");
+        }
+        return { success: true, product };
+    }
+    catch (error) {
+        console.error("Error obteniendo producto:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo producto");
+    }
+});
+/**
+ * Cloud Function para obtener categorías de productos
+ */
+exports.getCategories = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { parent } = request.data || {};
+    try {
+        const categories = await wooCommerce.getCategories(parent);
+        return { success: true, categories };
+    }
+    catch (error) {
+        console.error("Error obteniendo categorías:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo categorías");
+    }
+});
+/**
+ * Cloud Function para verificar disponibilidad de producto
+ */
+exports.checkAvailability = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { productId } = request.data || {};
+    if (!productId) {
+        throw new https_1.HttpsError("invalid-argument", "Se requiere productId");
+    }
+    try {
+        const availability = await wooCommerce.checkAvailability(productId);
+        return { success: true, availability };
+    }
+    catch (error) {
+        console.error("Error verificando disponibilidad:", error);
+        throw new https_1.HttpsError("internal", "Error verificando disponibilidad");
+    }
+});
+// ==================== CURSOS ====================
+/**
+ * Cloud Function para obtener cursos
  */
 exports.getCourses = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
-    const { category, search, limit } = request.data;
+    const { category, search, limit = 20 } = request.data || {};
     try {
         const courses = await agentCRM.getCourses({ category, search, limit });
         return { success: true, courses };
@@ -338,5 +398,130 @@ exports.getCourses = (0, https_1.onCall)({ enforceAppCheck: false }, async (requ
         console.error("Error obteniendo cursos:", error);
         throw new https_1.HttpsError("internal", "Error obteniendo cursos");
     }
+});
+/**
+ * Cloud Function para obtener detalle de un curso
+ */
+exports.getCourseDetail = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { courseId, courseName } = request.data || {};
+    try {
+        let course;
+        if (courseId) {
+            course = await agentCRM.getCourseById(courseId);
+        }
+        else if (courseName) {
+            course = await agentCRM.searchCourse(courseName);
+        }
+        else {
+            throw new https_1.HttpsError("invalid-argument", "Se requiere courseId o courseName");
+        }
+        return { success: true, course };
+    }
+    catch (error) {
+        console.error("Error obteniendo curso:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo curso");
+    }
+});
+/**
+ * Cloud Function para obtener próximos eventos
+ */
+exports.getUpcomingEvents = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { limit = 10 } = request.data || {};
+    try {
+        const events = await agentCRM.getUpcomingEvents(limit);
+        return { success: true, events };
+    }
+    catch (error) {
+        console.error("Error obteniendo eventos:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo eventos");
+    }
+});
+// ==================== ÓRDENES ====================
+/**
+ * Cloud Function para obtener órdenes de un cliente
+ */
+exports.getOrders = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { customerId, page = 1, limit = 10 } = request.data || {};
+    if (!customerId) {
+        throw new https_1.HttpsError("invalid-argument", "Se requiere customerId");
+    }
+    try {
+        const orders = await wooCommerce.getOrders(customerId, page, limit);
+        return { success: true, orders };
+    }
+    catch (error) {
+        console.error("Error obteniendo órdenes:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo órdenes");
+    }
+});
+/**
+ * Cloud Function para crear una orden
+ */
+exports.createOrder = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { customerId, lineItems, billing, shipping } = request.data || {};
+    if (!lineItems || lineItems.length === 0) {
+        throw new https_1.HttpsError("invalid-argument", "Se requieren productos en la orden");
+    }
+    try {
+        const order = await wooCommerce.createOrder({
+            customerId,
+            lineItems,
+            billing,
+            shipping,
+        });
+        return { success: true, order };
+    }
+    catch (error) {
+        console.error("Error creando orden:", error);
+        throw new https_1.HttpsError("internal", "Error creando orden");
+    }
+});
+// ==================== CLIENTES ====================
+/**
+ * Cloud Function para obtener o crear cliente
+ */
+exports.getOrCreateCustomer = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { email, firstName, lastName, billing } = request.data || {};
+    if (!email) {
+        throw new https_1.HttpsError("invalid-argument", "Se requiere email");
+    }
+    try {
+        // Primero buscar si existe
+        let customer = await wooCommerce.getCustomerByEmail(email);
+        if (!customer && firstName && lastName) {
+            // Crear nuevo cliente
+            customer = await wooCommerce.createCustomer({
+                email,
+                firstName,
+                lastName,
+                billing,
+            });
+        }
+        return { success: true, customer };
+    }
+    catch (error) {
+        console.error("Error con cliente:", error);
+        throw new https_1.HttpsError("internal", "Error procesando cliente");
+    }
+});
+/**
+ * Cloud Function para obtener información de contacto
+ */
+exports.getContactInfo = (0, https_1.onCall)({ enforceAppCheck: false }, async () => {
+    return {
+        success: true,
+        contact: {
+            nombre: "Fibro Academy USA",
+            direccion: "2684 NW 97th Ave, Doral, FL 33172",
+            telefono: "(305) 632-4630",
+            email: "hello@fibroacademyusa.com",
+            website: "https://fibroacademyusa.com",
+            horario: "Lunes a Viernes: 9:00 AM - 6:00 PM, Sábados: 10:00 AM - 2:00 PM",
+            redes_sociales: {
+                instagram: "@fibroacademyusa",
+                facebook: "FibroAcademyUSA",
+            },
+        },
+    };
 });
 //# sourceMappingURL=index.js.map
