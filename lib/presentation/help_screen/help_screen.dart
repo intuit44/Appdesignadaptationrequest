@@ -374,7 +374,9 @@ class HelpScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
-      _showCopyDialog(context, 'Email', 'info@fibroacademy.com');
+      if (context.mounted) {
+        _showCopyDialog(context, 'Email', 'info@fibroacademy.com');
+      }
     }
   }
 
@@ -383,7 +385,9 @@ class HelpScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
-      _showCopyDialog(context, 'Teléfono', '+1 (786) 555-0123');
+      if (context.mounted) {
+        _showCopyDialog(context, 'Teléfono', '+1 (786) 555-0123');
+      }
     }
   }
 
@@ -392,9 +396,11 @@ class HelpScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir WhatsApp')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir WhatsApp')),
+        );
+      }
     }
   }
 

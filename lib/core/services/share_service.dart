@@ -43,10 +43,12 @@ class ShareService {
     buffer.writeln(
         '📱 Descarga la app de Fibro Academy para más cursos y productos.');
 
-    await Share.share(
-      buffer.toString(),
-      subject: 'Curso: $courseName - Fibro Academy',
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        text: buffer.toString(),
+        subject: 'Curso: $courseName - Fibro Academy',
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
@@ -96,10 +98,12 @@ class ShareService {
     buffer.writeln(
         '📱 Descarga la app de Fibro Academy para más ofertas exclusivas.');
 
-    await Share.share(
-      buffer.toString(),
-      subject: 'Producto: $productName - Fibro Academy',
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        text: buffer.toString(),
+        subject: 'Producto: $productName - Fibro Academy',
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
@@ -123,10 +127,12 @@ Descarga la app ahora:
 🌐 Web: https://fibroacademyusa.com
 ''';
 
-    await Share.share(
-      message,
-      subject: 'Fibro Academy - Tu academia de estética',
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        text: message,
+        subject: 'Fibro Academy - Tu academia de estética',
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
@@ -160,10 +166,12 @@ Descarga la app ahora:
     buffer.writeln();
     buffer.writeln('📱 Fibro Academy');
 
-    await Share.share(
-      buffer.toString(),
-      subject: 'Promoción: $title - Fibro Academy',
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        text: buffer.toString(),
+        subject: 'Promoción: $title - Fibro Academy',
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
@@ -186,10 +194,12 @@ Descarga la app ahora:
     buffer.writeln();
     buffer.writeln('📱 Fibro Academy');
 
-    await Share.share(
-      buffer.toString(),
-      subject: title,
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        text: buffer.toString(),
+        subject: title,
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
@@ -204,11 +214,13 @@ Descarga la app ahora:
         ? '$title\n\n$description\n\n📱 Fibro Academy'
         : '$title\n\n📱 Fibro Academy';
 
-    await Share.shareXFiles(
-      [imageFile],
-      text: text,
-      subject: title,
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [imageFile],
+        text: text,
+        subject: title,
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 

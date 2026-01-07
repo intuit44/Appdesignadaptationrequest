@@ -192,7 +192,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         trailing: Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          activeColor: FibroColors.primaryOrange,
+          activeTrackColor: FibroColors.primaryOrange,
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return Colors.grey.shade400;
+          }),
         ),
       ),
     );
