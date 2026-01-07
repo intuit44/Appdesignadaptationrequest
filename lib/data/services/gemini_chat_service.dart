@@ -1,52 +1,34 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dio/dio.dart';
 
 /// Servicio para interactuar con el Chatbot de Gemini a través de Cloud Functions
-/// Proporciona respuestas en tiempo real con datos de WooCommerce y Agent CRM
-/// Usa cloud_functions en móvil y HTTP en web/Firebase Studio
+/// Usa HTTP directo para garantizar conexión en Android, iOS y Web
 class GeminiChatService {
-  final FirebaseFunctions? _functions;
-  final Dio? _dio;
+  final Dio _dio;
   static GeminiChatService? _instance;
 
   static const String _baseUrl =
       'https://us-central1-eng-gate-453810-h3.cloudfunctions.net';
 
-  // Historial de conversación para contexto
   List<Map<String, String>> _conversationHistory = [];
 
   GeminiChatService._()
-      : _functions = kIsWeb ? null : FirebaseFunctions.instance,
-        _dio = kIsWeb
-            ? Dio(BaseOptions(
-                baseUrl: _baseUrl,
-                connectTimeout: const Duration(seconds: 30),
-                receiveTimeout: const Duration(seconds: 60),
-                headers: {'Content-Type': 'application/json'},
-              ))
-            : null;
+      : _dio = Dio(BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 60),
+          headers: {'Content-Type': 'application/json'},
+        ));
 
   static GeminiChatService get instance {
     _instance ??= GeminiChatService._();
     return _instance!;
   }
 
-  /// Envía un mensaje al chatbot y recibe respuesta
   Future<ChatResponse> sendMessage(String message) async {
-    // Usar HTTP en web, cloud_functions en móvil
-    if (kIsWeb) {
-      return _sendMessageHttp(message);
-    } else {
-      return _sendMessageNative(message);
-    }
-  }
-
-  /// Envío vía HTTP (web/Firebase Studio)
-  Future<ChatResponse> _sendMessageHttp(String message) async {
     try {
-      final response = await _dio!.post(
+      final response = await _dio.post(
         '/chat',
         data: {
           'data': {
@@ -57,17 +39,24 @@ class GeminiChatService {
       );
 
       final result = response.data['result'] ?? response.data;
-      _updateHistory(result);
+
+      if (result['conversationHistory'] != null) {
+        _conversationHistory = List<Map<String, String>>.from(
+          (result['conversationHistory'] as List).map(
+            (item) => Map<String, String>.from(item),
+          ),
+        );
+      }
 
       return ChatResponse(
         success: result['success'] ?? false,
         message: result['response'] ?? 'No se pudo obtener respuesta',
       );
     } on DioException catch (e) {
-      debugPrint('GeminiChatService HTTP error: ${e.message}');
+      debugPrint('GeminiChatService error: ${e.message}');
       return ChatResponse(
         success: false,
-        message: _getHttpErrorMessage(e),
+        message: _getErrorMessage(e),
       );
     } catch (e) {
       debugPrint('GeminiChatService unexpected error: $e');
@@ -78,72 +67,14 @@ class GeminiChatService {
     }
   }
 
-  /// Envío vía cloud_functions (móvil nativo)
-  Future<ChatResponse> _sendMessageNative(String message) async {
-    try {
-      final callable = _functions!.httpsCallable('chat');
-      final response = await callable.call<Map<String, dynamic>>({
-        'message': message,
-        'conversationHistory': _conversationHistory,
-      });
-
-      final result = response.data;
-      _updateHistory(result);
-
-      return ChatResponse(
-        success: result['success'] ?? false,
-        message: result['response'] ?? 'No se pudo obtener respuesta',
-      );
-    } on FirebaseFunctionsException catch (e) {
-      debugPrint('GeminiChatService error: ${e.code} - ${e.message}');
-      return ChatResponse(
-        success: false,
-        message: _getNativeErrorMessage(e),
-      );
-    } catch (e) {
-      debugPrint('GeminiChatService unexpected error: $e');
-      return ChatResponse(
-        success: false,
-        message: 'Error inesperado. Por favor, intenta de nuevo.',
-      );
-    }
-  }
-
-  void _updateHistory(dynamic result) {
-    if (result['conversationHistory'] != null) {
-      _conversationHistory = List<Map<String, String>>.from(
-        (result['conversationHistory'] as List).map(
-          (item) => Map<String, String>.from(item),
-        ),
-      );
-    }
-  }
-
-  /// Limpia el historial de conversación
   void clearHistory() {
     _conversationHistory = [];
   }
 
-  /// Obtiene el historial actual
   List<Map<String, String>> get conversationHistory =>
       List.unmodifiable(_conversationHistory);
 
-  String _getNativeErrorMessage(FirebaseFunctionsException e) {
-    switch (e.code) {
-      case 'unavailable':
-        return 'El servicio no está disponible. Por favor, intenta más tarde.';
-      case 'deadline-exceeded':
-        return 'La conexión tardó demasiado. Por favor, intenta de nuevo.';
-      case 'internal':
-        return 'Error interno del servidor. Por favor, intenta más tarde.';
-      case 'unauthenticated':
-        return 'Sesión no válida. Por favor, inicia sesión de nuevo.';
-      default:
-        return 'Error de conexión. Por favor, intenta de nuevo.';
-    }
-  }
-
-  String _getHttpErrorMessage(DioException e) {
+  String _getErrorMessage(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

@@ -244,7 +244,7 @@ RESTRICCIONES:
  * Cloud Function principal para el chatbot
  * Recibe mensajes y responde usando Gemini con Function Calling
  */
-exports.chat = (0, https_1.onCall)(async (request) => {
+exports.chat = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
     const { message, conversationHistory = [] } = request.data;
     if (!message) {
         throw new https_1.HttpsError("invalid-argument", "Se requiere un mensaje");
@@ -314,7 +314,7 @@ exports.chat = (0, https_1.onCall)(async (request) => {
 /**
  * Cloud Function para obtener productos (acceso directo sin chat)
  */
-exports.getProducts = (0, https_1.onCall)(async (request) => {
+exports.getProducts = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
     const { category, search, limit } = request.data;
     try {
         const products = await wooCommerce.getProducts({ category, search, limit });
@@ -328,7 +328,7 @@ exports.getProducts = (0, https_1.onCall)(async (request) => {
 /**
  * Cloud Function para obtener cursos (acceso directo sin chat)
  */
-exports.getCourses = (0, https_1.onCall)(async (request) => {
+exports.getCourses = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
     const { category, search, limit } = request.data;
     try {
         const courses = await agentCRM.getCourses({ category, search, limit });
