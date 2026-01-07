@@ -11,4 +11,5 @@
 *.hprof
 
 # Proyectos anidados temporales
-/tempfix/
+/tempfix/functions/.env
+functions/node_modules/

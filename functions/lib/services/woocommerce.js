@@ -11,11 +11,11 @@ exports.WooCommerceAPI = void 0;
 const axios_1 = __importDefault(require("axios"));
 class WooCommerceAPI {
     constructor() {
-        // Credenciales desde variables de entorno de Firebase
+        // Usar los MISMOS nombres de variables que el .env principal
         this.config = {
-            url: process.env.WOOCOMMERCE_URL || "https://fibroacademyusa.com",
-            consumerKey: process.env.WOOCOMMERCE_KEY || "",
-            consumerSecret: process.env.WOOCOMMERCE_SECRET || "",
+            url: process.env.WC_BASE_URL || "https://fibroacademyusa.com",
+            consumerKey: process.env.WC_CONSUMER_KEY || "",
+            consumerSecret: process.env.WC_CONSUMER_SECRET || "",
         };
         this.client = axios_1.default.create({
             baseURL: `${this.config.url}/wp-json/wc/v3`,

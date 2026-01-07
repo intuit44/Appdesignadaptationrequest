@@ -33,6 +33,25 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZNShZTBmsn_Ok5opPNCK14ULFnPQMMcc",
+      authDomain: "eng-gate-453810-h3.firebaseapp.com",
+      projectId: "eng-gate-453810-h3",
+      storageBucket: "eng-gate-453810-h3.firebasestorage.app",
+      messagingSenderId: "413116602762",
+      appId: "1:413116602762:web:2f9572b766d26af0701073",
+      measurementId: "G-PMRY7ZKMP5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
