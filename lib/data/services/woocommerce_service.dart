@@ -344,6 +344,287 @@ class WooCommerceService {
   }) async {
     return null;
   }
+
+  // ==================== Tutoriales ====================
+
+  /// Obtiene categorías de tutoriales con sus videos
+  Future<List<TutorialCategory>> getTutorials({String? category}) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.cfGetTutorials,
+        data: {
+          'data': {
+            if (category != null) 'category': category,
+          },
+        },
+      );
+
+      final result = _extractResult(response.data);
+      if (result['success'] == true && result['categories'] != null) {
+        return (result['categories'] as List)
+            .map((json) => TutorialCategory.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      // NO fallback con datos estáticos - devolver vacío
+      return [];
+    }
+  }
+
+  // ==================== Mentores ====================
+
+  /// Obtiene lista de mentores/instructores
+  Future<List<MentorModel>> getMentors() async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.cfGetMentors,
+        data: {'data': {}},
+      );
+
+      final result = _extractResult(response.data);
+      if (result['success'] == true && result['mentors'] != null) {
+        return (result['mentors'] as List)
+            .map((json) => MentorModel.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      // NO fallback con datos estáticos - devolver vacío
+      return [];
+    }
+  }
+}
+
+// ==================== Modelos de Tutoriales ====================
+
+/// Modelo de Tutorial
+class Tutorial {
+  final String id;
+  final String title;
+  final String description;
+  final String duration;
+  final String? videoUrl;
+  final String? thumbnailUrl;
+  final String category;
+  final bool isAvailable;
+
+  Tutorial({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.duration,
+    this.videoUrl,
+    this.thumbnailUrl,
+    required this.category,
+    this.isAvailable = true,
+  });
+
+  factory Tutorial.fromJson(Map<String, dynamic> json) {
+    return Tutorial(
+      id: json['id']?.toString() ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      duration: json['duration'] ?? 'Variable',
+      videoUrl: json['videoUrl'],
+      thumbnailUrl: json['thumbnailUrl'],
+      category: json['category'] ?? '',
+      isAvailable: json['isAvailable'] ?? true,
+    );
+  }
+}
+
+/// Modelo de Categoría de Tutoriales
+class TutorialCategory {
+  final String id;
+  final String title;
+  final String icon;
+  final String color;
+  final List<Tutorial> tutorials;
+
+  TutorialCategory({
+    required this.id,
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.tutorials,
+  });
+
+  factory TutorialCategory.fromJson(Map<String, dynamic> json) {
+    return TutorialCategory(
+      id: json['id']?.toString() ?? '',
+      title: json['title'] ?? '',
+      icon: json['icon'] ?? 'play_circle_outline',
+      color: json['color'] ?? '#FF5722',
+      tutorials: (json['tutorials'] as List?)
+              ?.map((t) => Tutorial.fromJson(t))
+              .toList() ??
+          [],
+    );
+  }
+
+  /// Retorna categorías estáticas como fallback
+  static List<TutorialCategory> getStaticCategories() {
+    return [
+      TutorialCategory(
+        id: 'getting-started',
+        title: 'Primeros Pasos',
+        icon: 'play_circle_outline',
+        color: '#FF5722',
+        tutorials: [
+          Tutorial(
+            id: 'welcome',
+            title: 'Bienvenida a Fibroskin Academy',
+            description: 'Conoce nuestra academia y lo que aprenderás.',
+            duration: '5:30',
+            category: 'getting-started',
+          ),
+          Tutorial(
+            id: 'navigation',
+            title: 'Cómo navegar la app',
+            description: 'Guía rápida de todas las funciones de la aplicación.',
+            duration: '3:45',
+            category: 'getting-started',
+          ),
+        ],
+      ),
+      TutorialCategory(
+        id: 'basic-techniques',
+        title: 'Técnicas Básicas',
+        icon: 'school_outlined',
+        color: '#26A69A',
+        tutorials: [
+          Tutorial(
+            id: 'skin-prep',
+            title: 'Preparación de la piel',
+            description: 'Limpieza y preparación antes del procedimiento.',
+            duration: '8:15',
+            category: 'basic-techniques',
+          ),
+          Tutorial(
+            id: 'dermograph',
+            title: 'Uso correcto del dermógrafo',
+            description: 'Manejo profesional del equipo de micropigmentación.',
+            duration: '12:00',
+            category: 'basic-techniques',
+          ),
+        ],
+      ),
+      TutorialCategory(
+        id: 'advanced-techniques',
+        title: 'Técnicas Avanzadas',
+        icon: 'auto_awesome',
+        color: '#9C27B0',
+        tutorials: [
+          Tutorial(
+            id: 'microblading',
+            title: 'Microblading pelo a pelo',
+            description: 'Técnica avanzada para cejas naturales.',
+            duration: '20:00',
+            category: 'advanced-techniques',
+          ),
+        ],
+      ),
+      TutorialCategory(
+        id: 'business-marketing',
+        title: 'Negocio y Marketing',
+        icon: 'business_center_outlined',
+        color: '#FFA000',
+        tutorials: [
+          Tutorial(
+            id: 'portfolio',
+            title: 'Crea tu portafolio',
+            description: 'Fotografía tus trabajos profesionalmente.',
+            duration: '10:00',
+            category: 'business-marketing',
+          ),
+        ],
+      ),
+    ];
+  }
+}
+
+// ==================== Modelo de Mentor ====================
+
+/// Modelo de Mentor/Instructor
+class MentorModel {
+  final String id;
+  final String name;
+  final String title;
+  final String bio;
+  final String? imageUrl;
+  final List<String> specialties;
+  final Map<String, String> socialLinks;
+
+  MentorModel({
+    required this.id,
+    required this.name,
+    required this.title,
+    required this.bio,
+    this.imageUrl,
+    required this.specialties,
+    required this.socialLinks,
+  });
+
+  factory MentorModel.fromJson(Map<String, dynamic> json) {
+    return MentorModel(
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      title: json['title'] ?? '',
+      bio: json['bio'] ?? '',
+      imageUrl: json['imageUrl'],
+      specialties: List<String>.from(json['specialties'] ?? []),
+      socialLinks: Map<String, String>.from(json['socialLinks'] ?? {}),
+    );
+  }
+
+  /// Retorna mentores estáticos como fallback
+  static List<MentorModel> getStaticMentors() {
+    return [
+      MentorModel(
+        id: '1',
+        name: 'Fibro Academy Team',
+        title: 'Equipo de Instructores',
+        bio:
+            'Nuestro equipo de instructores certificados con años de experiencia en micropigmentación, estética facial y corporal.',
+        specialties: [
+          'Microblading',
+          'Micropigmentación',
+          'Estética Facial',
+          'Tratamientos Corporales'
+        ],
+        socialLinks: {'instagram': '@fibroacademyusa'},
+      ),
+      MentorModel(
+        id: '2',
+        name: 'Master Trainer',
+        title: 'Instructor Principal',
+        bio:
+            'Especialista en técnicas avanzadas de micropigmentación con certificaciones internacionales.',
+        specialties: [
+          'Microblading Avanzado',
+          'Powder Brows',
+          'Lip Blushing',
+          'Correcciones'
+        ],
+        socialLinks: {'instagram': '@fibroacademyusa'},
+      ),
+      MentorModel(
+        id: '3',
+        name: 'Beauty Expert',
+        title: 'Especialista en Skincare',
+        bio:
+            'Experta en tratamientos faciales y protocolos de skincare profesional.',
+        specialties: [
+          'Skincare Profesional',
+          'Faciales',
+          'Peelings',
+          'Hidratación'
+        ],
+        socialLinks: {'instagram': '@fibroacademyusa'},
+      ),
+    ];
+  }
 }
 
 /// Provider para WooCommerceService

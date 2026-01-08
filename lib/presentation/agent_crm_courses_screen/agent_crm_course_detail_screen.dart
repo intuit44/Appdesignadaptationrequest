@@ -6,6 +6,7 @@ import '../../core/app_export.dart';
 import '../../core/services/share_service.dart';
 import '../../data/models/agent_crm_models.dart';
 import '../../widgets/custom_elevated_button.dart';
+import '../membership_portal_screen/membership_portal_screen.dart';
 
 /// Pantalla de detalles de un curso de Agent CRM Pro
 /// Muestra información detallada del curso, precio, y opciones de inscripción
@@ -614,26 +615,12 @@ class _AgentCRMCourseDetailScreenState
   }
 
   void _enrollCourse() async {
-    // Abrir URL de inscripción en Agent CRM / Go High Level
-    final Uri enrollUrl =
-        Uri.parse('https://hub.fibrolovers.com/membership-account');
-
-    if (await canLaunchUrl(enrollUrl)) {
-      await launchUrl(enrollUrl, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Contacta a Fibro Academy para inscribirte'),
-            backgroundColor: appTheme.deepOrange400,
-            action: SnackBarAction(
-              label: 'WhatsApp',
-              textColor: Colors.white,
-              onPressed: _contactUs,
-            ),
-          ),
-        );
-      }
-    }
+    // Abrir portal de membresía directamente en la app
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MembershipPortalScreen(),
+      ),
+    );
   }
 }

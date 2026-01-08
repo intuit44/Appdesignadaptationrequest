@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
 
 import '../core/app_export.dart';
+import '../data/models/agent_crm_models.dart';
 
 /// Widget que muestra una categoría de curso en formato de tarjeta grande
-class CourseCategoryCard extends StatelessWidget {
+/// Usa ConsumerWidget para obtener el conteo de cursos del CRM
+class CourseCategoryCard extends ConsumerWidget {
   final CourseCategoryInfo category;
   final VoidCallback? onTap;
   final bool showCourseCount;
@@ -17,7 +19,14 @@ class CourseCategoryCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Obtener conteo de cursos del CRM basado en productType
+    final coursesAsync = ref.watch(crmCoursesProvider);
+    final courseCount = coursesAsync.maybeWhen(
+      data: (courses) => _getCourseCount(courses),
+      orElse: () => 0,
+    );
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -46,18 +55,6 @@ class CourseCategoryCard extends StatelessWidget {
                         loadStateChanged: (ExtendedImageState state) {
                           switch (state.extendedImageLoadState) {
                             case LoadState.loading:
-                              return Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      category.color,
-                                      category.color.withValues(alpha: 0.8),
-                                    ],
-                                  ),
-                                ),
-                              );
                             case LoadState.failed:
                               return Container(
                                 decoration: BoxDecoration(
@@ -72,7 +69,7 @@ class CourseCategoryCard extends StatelessWidget {
                                 ),
                               );
                             case LoadState.completed:
-                              return null; // Usa la imagen cargada
+                              return null;
                           }
                         },
                       )
@@ -89,7 +86,7 @@ class CourseCategoryCard extends StatelessWidget {
                         ),
                       ),
               ),
-              // Overlay oscuro para legibilidad
+              // Overlay oscuro
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -149,7 +146,7 @@ class CourseCategoryCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (showCourseCount)
+                        if (showCourseCount && courseCount > 0)
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 12.h,
@@ -160,18 +157,29 @@ class CourseCategoryCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20.h),
                             ),
                             child: Text(
-                              '${category.courses.length} cursos',
+                              '$courseCount cursos',
                               style: TextStyle(
                                 fontSize: 12.fSize,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
                               ),
                             ),
-                          ),
+                          )
+                        else if (showCourseCount)
+                          coursesAsync.isLoading
+                              ? SizedBox(
+                                  width: 16.h,
+                                  height: 16.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                         Container(
                           width: 36.h,
                           height: 36.h,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
@@ -191,6 +199,13 @@ class CourseCategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  int _getCourseCount(List<AgentCRMProduct> courses) {
+    if (category.productType == null || category.id == 'all') {
+      return courses.length;
+    }
+    return courses.where((c) => c.productType == category.productType).length;
   }
 }
 
@@ -269,7 +284,7 @@ class CourseCategoriesCarousel extends StatelessWidget {
 }
 
 /// Widget de categoría de curso compacto (para lista vertical)
-class CourseCategoryListTile extends StatelessWidget {
+class CourseCategoryListTile extends ConsumerWidget {
   final CourseCategoryInfo category;
   final VoidCallback? onTap;
 
@@ -280,7 +295,13 @@ class CourseCategoryListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coursesAsync = ref.watch(crmCoursesProvider);
+    final courseCount = coursesAsync.maybeWhen(
+      data: (courses) => _getCourseCount(courses),
+      orElse: () => 0,
+    );
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16.h),
@@ -339,7 +360,7 @@ class CourseCategoryListTile extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  // Cursos disponibles
+                  // Cursos disponibles - dinámico del CRM
                   Row(
                     children: [
                       Icon(
@@ -348,14 +369,23 @@ class CourseCategoryListTile extends StatelessWidget {
                         color: category.color,
                       ),
                       SizedBox(width: 4.h),
-                      Text(
-                        '${category.courses.length} cursos disponibles',
-                        style: TextStyle(
-                          fontSize: 12.fSize,
-                          color: category.color,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      coursesAsync.isLoading
+                          ? SizedBox(
+                              width: 12.h,
+                              height: 12.h,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                color: category.color,
+                              ),
+                            )
+                          : Text(
+                              '$courseCount cursos disponibles',
+                              style: TextStyle(
+                                fontSize: 12.fSize,
+                                color: category.color,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                     ],
                   ),
                 ],
@@ -371,6 +401,13 @@ class CourseCategoryListTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  int _getCourseCount(List<AgentCRMProduct> courses) {
+    if (category.productType == null || category.id == 'all') {
+      return courses.length;
+    }
+    return courses.where((c) => c.productType == category.productType).length;
   }
 }
 

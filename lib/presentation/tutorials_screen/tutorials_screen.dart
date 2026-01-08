@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_export.dart';
+import '../../data/services/woocommerce_service.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 
+/// Provider para tutoriales
+final tutorialsProvider =
+    FutureProvider.autoDispose<List<TutorialCategory>>((ref) async {
+  final wcService = ref.read(wooCommerceServiceProvider);
+  return wcService.getTutorials();
+});
+
 /// Pantalla de Tutoriales - Videos y guías de aprendizaje
+/// Conectada a Cloud Functions para datos reales
 class TutorialsScreen extends ConsumerStatefulWidget {
   const TutorialsScreen({super.key});
 
@@ -14,119 +24,35 @@ class TutorialsScreen extends ConsumerStatefulWidget {
 }
 
 class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
-  final List<_TutorialCategory> _categories = [
-    _TutorialCategory(
-      title: 'Primeros Pasos',
-      icon: Icons.play_circle_outline,
-      color: FibroColors.primaryOrange,
-      tutorials: [
-        _Tutorial(
-          title: 'Bienvenida a Fibroskin Academy',
-          duration: '5:30',
-          thumbnail: 'welcome',
-          description: 'Conoce nuestra academia y lo que aprenderás.',
-        ),
-        _Tutorial(
-          title: 'Cómo navegar la app',
-          duration: '3:45',
-          thumbnail: 'navigation',
-          description: 'Guía rápida de todas las funciones de la aplicación.',
-        ),
-        _Tutorial(
-          title: 'Tu primera compra',
-          duration: '4:20',
-          thumbnail: 'shopping',
-          description: 'Paso a paso para comprar tus primeros productos.',
-        ),
-      ],
-    ),
-    _TutorialCategory(
-      title: 'Técnicas Básicas',
-      icon: Icons.school_outlined,
-      color: FibroColors.secondaryTeal,
-      tutorials: [
-        _Tutorial(
-          title: 'Preparación de la piel',
-          duration: '8:15',
-          thumbnail: 'skin_prep',
-          description: 'Limpieza y preparación antes del procedimiento.',
-        ),
-        _Tutorial(
-          title: 'Uso correcto del dermógrafo',
-          duration: '12:00',
-          thumbnail: 'dermograph',
-          description: 'Manejo profesional del equipo de micropigmentación.',
-        ),
-        _Tutorial(
-          title: 'Pigmentos y colorimetría',
-          duration: '15:30',
-          thumbnail: 'pigments',
-          description: 'Selección de colores según el tipo de piel.',
-        ),
-      ],
-    ),
-    _TutorialCategory(
-      title: 'Técnicas Avanzadas',
-      icon: Icons.auto_awesome,
-      color: Colors.purple,
-      tutorials: [
-        _Tutorial(
-          title: 'Microblading pelo a pelo',
-          duration: '20:00',
-          thumbnail: 'microblading',
-          description: 'Técnica avanzada para cejas naturales.',
-        ),
-        _Tutorial(
-          title: 'Labios con efecto 3D',
-          duration: '18:45',
-          thumbnail: 'lips_3d',
-          description: 'Creación de volumen y definición en labios.',
-        ),
-        _Tutorial(
-          title: 'Corrección de trabajos',
-          duration: '25:00',
-          thumbnail: 'correction',
-          description: 'Cómo corregir y mejorar trabajos previos.',
-        ),
-      ],
-    ),
-    _TutorialCategory(
-      title: 'Negocio y Marketing',
-      icon: Icons.business_center_outlined,
-      color: Colors.amber.shade700,
-      tutorials: [
-        _Tutorial(
-          title: 'Crea tu portafolio',
-          duration: '10:00',
-          thumbnail: 'portfolio',
-          description: 'Fotografía tus trabajos profesionalmente.',
-        ),
-        _Tutorial(
-          title: 'Marketing en redes sociales',
-          duration: '14:30',
-          thumbnail: 'marketing',
-          description: 'Estrategias para atraer más clientes.',
-        ),
-        _Tutorial(
-          title: 'Precios y presupuestos',
-          duration: '8:00',
-          thumbnail: 'pricing',
-          description: 'Cómo establecer tus tarifas competitivamente.',
-        ),
-      ],
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final tutorialsAsync = ref.watch(tutorialsProvider);
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: appTheme.gray50,
         appBar: _buildAppBar(context),
-        body: ListView.builder(
-          padding: EdgeInsets.all(16.h),
-          itemCount: _categories.length,
-          itemBuilder: (context, index) => _buildCategory(_categories[index]),
+        body: tutorialsAsync.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(
+              color: FibroColors.primaryOrange,
+            ),
+          ),
+          error: (error, stack) => _buildErrorState(error),
+          data: (categories) => categories.isEmpty
+              ? _buildEmptyState()
+              : RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(tutorialsProvider);
+                  },
+                  color: FibroColors.primaryOrange,
+                  child: ListView.builder(
+                    padding: EdgeInsets.all(16.h),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) =>
+                        _buildCategory(categories[index]),
+                  ),
+                ),
         ),
       ),
     );
@@ -144,11 +70,103 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
         text: 'Tutoriales',
         margin: EdgeInsets.only(left: 8.h),
       ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.refresh, color: appTheme.blueGray80001),
+          onPressed: () {
+            ref.invalidate(tutorialsProvider);
+          },
+        ),
+      ],
       styleType: Style.bgFill,
     );
   }
 
-  Widget _buildCategory(_TutorialCategory category) {
+  Widget _buildErrorState(Object error) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(24.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64.h,
+              color: Colors.red.shade300,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'Error al cargar tutoriales',
+              style: TextStyle(
+                fontSize: 18.fSize,
+                fontWeight: FontWeight.bold,
+                color: appTheme.blueGray80001,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              error.toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.fSize,
+                color: appTheme.blueGray600,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            ElevatedButton.icon(
+              onPressed: () => ref.invalidate(tutorialsProvider),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: FibroColors.primaryOrange,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(24.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.video_library_outlined,
+              size: 64.h,
+              color: appTheme.blueGray600,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'No hay tutoriales disponibles',
+              style: TextStyle(
+                fontSize: 18.fSize,
+                fontWeight: FontWeight.bold,
+                color: appTheme.blueGray80001,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Los tutoriales estarán disponibles próximamente',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.fSize,
+                color: appTheme.blueGray600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategory(TutorialCategory category) {
+    final color = _parseColor(category.color);
+
     return Container(
       margin: EdgeInsets.only(bottom: 24.h),
       child: Column(
@@ -160,40 +178,52 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
               Container(
                 padding: EdgeInsets.all(8.h),
                 decoration: BoxDecoration(
-                  color: category.color.withValues(alpha: 0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.h),
                 ),
                 child: Icon(
-                  category.icon,
-                  color: category.color,
+                  _getIconData(category.icon),
+                  color: color,
                   size: 24.h,
                 ),
               ),
               SizedBox(width: 12.h),
-              Text(
-                category.title,
-                style: TextStyle(
-                  fontSize: 18.fSize,
-                  fontWeight: FontWeight.bold,
-                  color: appTheme.blueGray80001,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      category.title,
+                      style: TextStyle(
+                        fontSize: 18.fSize,
+                        fontWeight: FontWeight.bold,
+                        color: appTheme.blueGray80001,
+                      ),
+                    ),
+                    Text(
+                      '${category.tutorials.length} video${category.tutorials.length != 1 ? 's' : ''}',
+                      style: TextStyle(
+                        fontSize: 12.fSize,
+                        color: appTheme.blueGray600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           SizedBox(height: 12.h),
           // Lista de tutoriales
-          ...category.tutorials.map((tutorial) => _buildTutorialCard(
-                tutorial,
-                category.color,
-              )),
+          ...category.tutorials
+              .map((tutorial) => _buildTutorialCard(tutorial, color)),
         ],
       ),
     );
   }
 
-  Widget _buildTutorialCard(_Tutorial tutorial, Color accentColor) {
+  Widget _buildTutorialCard(Tutorial tutorial, Color accentColor) {
     return GestureDetector(
-      onTap: () => _playTutorial(context, tutorial),
+      onTap: () => _playTutorial(context, tutorial, accentColor),
       child: Container(
         margin: EdgeInsets.only(bottom: 12.h),
         decoration: BoxDecoration(
@@ -218,14 +248,24 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
                 borderRadius: BorderRadius.horizontal(
                   left: Radius.circular(12.h),
                 ),
+                image: tutorial.thumbnailUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(tutorial.thumbnailUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Icon(
-                    Icons.play_circle_filled,
+                    tutorial.isAvailable
+                        ? Icons.play_circle_filled
+                        : Icons.lock_outline,
                     size: 40.h,
-                    color: accentColor,
+                    color: tutorial.thumbnailUrl != null
+                        ? Colors.white
+                        : accentColor,
                   ),
                   // Duración
                   Positioned(
@@ -299,7 +339,15 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
     );
   }
 
-  void _playTutorial(BuildContext context, _Tutorial tutorial) {
+  void _playTutorial(
+      BuildContext context, Tutorial tutorial, Color accentColor) {
+    // Si tiene URL de video, intentar abrirlo
+    if (tutorial.videoUrl != null && tutorial.isAvailable) {
+      _openVideo(tutorial.videoUrl!);
+      return;
+    }
+
+    // Mostrar modal con información del tutorial
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -335,32 +383,44 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
                         decoration: BoxDecoration(
                           color: Colors.black87,
                           borderRadius: BorderRadius.circular(12.h),
+                          image: tutorial.thumbnailUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(tutorial.thumbnailUrl!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.play_circle_outline,
+                                tutorial.isAvailable
+                                    ? Icons.play_circle_outline
+                                    : Icons.lock_outline,
                                 size: 80.h,
                                 color: Colors.white70,
                               ),
                               SizedBox(height: 16.h),
                               Text(
-                                'Video en desarrollo',
+                                tutorial.isAvailable
+                                    ? 'Reproducir video'
+                                    : 'Video no disponible',
                                 style: TextStyle(
                                   fontSize: 16.fSize,
                                   color: Colors.white70,
                                 ),
                               ),
-                              SizedBox(height: 8.h),
-                              Text(
-                                'Disponible próximamente',
-                                style: TextStyle(
-                                  fontSize: 14.fSize,
-                                  color: Colors.white54,
+                              if (!tutorial.isAvailable) ...[
+                                SizedBox(height: 8.h),
+                                Text(
+                                  'Disponible próximamente',
+                                  style: TextStyle(
+                                    fontSize: 14.fSize,
+                                    color: Colors.white54,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),
@@ -408,36 +468,49 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
                             ),
                           ),
                           const Spacer(),
-                          // Botón de notificarme
+                          // Botón de acción
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.notifications_active,
-                                          color: Colors.white,
-                                        ),
-                                        SizedBox(width: 8.h),
-                                        const Text(
-                                          'Te notificaremos cuando esté disponible',
-                                        ),
-                                      ],
+                                if (tutorial.videoUrl != null &&
+                                    tutorial.isAvailable) {
+                                  _openVideo(tutorial.videoUrl!);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.notifications_active,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 8.h),
+                                          const Text(
+                                            'Te notificaremos cuando esté disponible',
+                                          ),
+                                        ],
+                                      ),
+                                      backgroundColor:
+                                          FibroColors.secondaryTeal,
+                                      behavior: SnackBarBehavior.floating,
                                     ),
-                                    backgroundColor: FibroColors.secondaryTeal,
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
+                                  );
+                                }
                               },
-                              icon: const Icon(Icons.notifications_none),
-                              label:
-                                  const Text('Notificarme cuando esté listo'),
+                              icon: Icon(
+                                tutorial.isAvailable
+                                    ? Icons.play_arrow
+                                    : Icons.notifications_none,
+                              ),
+                              label: Text(
+                                tutorial.isAvailable
+                                    ? 'Ver tutorial'
+                                    : 'Notificarme cuando esté listo',
+                              ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: FibroColors.primaryOrange,
+                                backgroundColor: accentColor,
                                 foregroundColor: Colors.white,
                                 padding: EdgeInsets.symmetric(vertical: 14.h),
                                 shape: RoundedRectangleBorder(
@@ -458,32 +531,48 @@ class _TutorialsScreenState extends ConsumerState<TutorialsScreen> {
       ),
     );
   }
-}
 
-class _TutorialCategory {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final List<_Tutorial> tutorials;
+  Future<void> _openVideo(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se puede abrir el video: $url'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
-  _TutorialCategory({
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.tutorials,
-  });
-}
+  Color _parseColor(String colorStr) {
+    try {
+      if (colorStr.startsWith('#')) {
+        return Color(int.parse(colorStr.substring(1), radix: 16) + 0xFF000000);
+      }
+      return FibroColors.primaryOrange;
+    } catch (_) {
+      return FibroColors.primaryOrange;
+    }
+  }
 
-class _Tutorial {
-  final String title;
-  final String duration;
-  final String thumbnail;
-  final String description;
-
-  _Tutorial({
-    required this.title,
-    required this.duration,
-    required this.thumbnail,
-    required this.description,
-  });
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'play_circle_outline':
+        return Icons.play_circle_outline;
+      case 'school_outlined':
+        return Icons.school_outlined;
+      case 'auto_awesome':
+        return Icons.auto_awesome;
+      case 'business_center_outlined':
+        return Icons.business_center_outlined;
+      case 'star_outline':
+        return Icons.star_outline;
+      default:
+        return Icons.play_circle_outline;
+    }
+  }
 }

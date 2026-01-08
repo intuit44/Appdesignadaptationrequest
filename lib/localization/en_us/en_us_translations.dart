@@ -152,7 +152,7 @@ final Map<String, String> enUs = {
 
   // Common String
   "lbl": "*************",
-  "lbl_2021_educatsy": "©2021 Educatsy",
+  "lbl_2021_educatsy": "©2024 Fibro Academy",
   "lbl_30": "30",
   "lbl_39_00": "\$39.00",
   "lbl_5": "5",
@@ -213,7 +213,8 @@ final Map<String, String> enUs = {
   "msg_become_an_instructor": "Become An Instructor",
   "msg_classroom_courses": "Classroom courses",
   "msg_e_learning_courses": "E-learning courses",
-  "msg_educatsy_is_a_registered": "Educatsy is a registered",
+  "msg_educatsy_is_a_registered":
+      "Fibro Academy is a registered beauty education platform.",
   "msg_enter_your_email": "enter your email",
   "msg_founder_mentor": "Founder & Mentor",
   "msg_home_become_an": "Home | Become An Instructor",

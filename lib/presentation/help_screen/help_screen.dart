@@ -102,7 +102,7 @@ class HelpScreen extends StatelessWidget {
                 child: _buildContactCard(
                   icon: Icons.email_outlined,
                   title: 'Email',
-                  subtitle: 'info@fibroacademy.com',
+                  subtitle: FibroContactInfo.email,
                   color: Colors.blue,
                   onTap: () => _launchEmail(context),
                 ),
@@ -112,7 +112,7 @@ class HelpScreen extends StatelessWidget {
                 child: _buildContactCard(
                   icon: Icons.phone_outlined,
                   title: 'Teléfono',
-                  subtitle: '+1 (786) 555-0123',
+                  subtitle: FibroContactInfo.phone1,
                   color: Colors.green,
                   onTap: () => _launchPhone(context),
                 ),
@@ -370,29 +370,29 @@ class HelpScreen extends StatelessWidget {
   }
 
   void _launchEmail(BuildContext context) async {
-    final uri = Uri.parse('mailto:info@fibroacademy.com');
+    final uri = Uri.parse('mailto:${FibroContactInfo.email}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        _showCopyDialog(context, 'Email', 'info@fibroacademy.com');
+        _showCopyDialog(context, 'Email', FibroContactInfo.email);
       }
     }
   }
 
   void _launchPhone(BuildContext context) async {
-    final uri = Uri.parse('tel:+17865550123');
+    final uri = Uri.parse('tel:${FibroContactInfo.phone2}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        _showCopyDialog(context, 'Teléfono', '+1 (786) 555-0123');
+        _showCopyDialog(context, 'Teléfono', FibroContactInfo.phone1);
       }
     }
   }
 
   void _launchWhatsApp(BuildContext context) async {
-    final uri = Uri.parse('https://wa.me/17865550123');
+    final uri = Uri.parse(FibroContactInfo.whatsappUrl);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
@@ -482,14 +482,14 @@ class HelpScreen extends StatelessWidget {
   }
 
   void _launchWebsite(BuildContext context) async {
-    final uri = Uri.parse('https://fibroacademyusa.com');
+    final uri = Uri.parse(FibroContactInfo.website);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
   void _launchSocialMedia(BuildContext context) async {
-    final uri = Uri.parse('https://instagram.com/fibroacademyusa');
+    final uri = Uri.parse(FibroContactInfo.instagramUrl);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

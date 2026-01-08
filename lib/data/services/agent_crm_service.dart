@@ -119,20 +119,24 @@ class AgentCRMService {
   // ==================== Contacts ====================
 
   /// Obtiene lista de contactos
+  /// Nota: Go High Level API v2 no soporta 'skip', usa 'startAfterId' para paginación
   Future<List<AgentCRMContact>> getContacts({
     int limit = 100,
-    int skip = 0,
     String? query,
+    String? startAfterId,
   }) async {
     try {
       final queryParams = <String, dynamic>{
         'locationId': _locationId,
         'limit': limit,
-        'skip': skip,
       };
 
       if (query != null && query.isNotEmpty) {
         queryParams['query'] = query;
+      }
+
+      if (startAfterId != null && startAfterId.isNotEmpty) {
+        queryParams['startAfterId'] = startAfterId;
       }
 
       final response = await _dio.get(
@@ -140,8 +144,24 @@ class AgentCRMService {
         queryParameters: queryParams,
       );
 
-      if (response.data != null && response.data['contacts'] != null) {
-        return (response.data['contacts'] as List)
+      if (response.data != null) {
+        // La respuesta puede ser un Map con 'contacts' o directamente una List
+        List<dynamic> contactsList = [];
+
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          final contactsData = data['contacts'];
+          if (contactsData is List) {
+            contactsList = contactsData;
+          } else if (data['contact'] is Map<String, dynamic>) {
+            contactsList = [data['contact']];
+          }
+        } else if (data is List) {
+          contactsList = data;
+        }
+
+        return contactsList
+            .whereType<Map<String, dynamic>>()
             .map((json) => AgentCRMContact.fromJson(json))
             .toList();
       }
@@ -214,10 +234,26 @@ class AgentCRMService {
 
       if (response.statusCode == 200 && response.data != null) {
         List<dynamic> contacts = [];
+
+        // Manejar diferentes formatos de respuesta
         if (response.data is List) {
-          contacts = response.data;
-        } else if (response.data is Map && response.data['contacts'] != null) {
-          contacts = response.data['contacts'] as List;
+          contacts = response.data as List;
+        } else if (response.data is Map) {
+          final data = response.data as Map<String, dynamic>;
+          if (data['contacts'] != null) {
+            contacts = data['contacts'] is List ? data['contacts'] as List : [];
+          } else if (data['contact'] != null) {
+            // Respuesta de contacto único
+            final contact = data['contact'];
+            if (contact is Map<String, dynamic>) {
+              final contactEmail =
+                  contact['email']?.toString().toLowerCase().trim();
+              if (contactEmail == normalizedEmail) {
+                debugPrint('AgentCRMService: Contacto encontrado (único)');
+                return AgentCRMContact.fromJson(contact);
+              }
+            }
+          }
         }
 
         // Filtrar exactamente por email

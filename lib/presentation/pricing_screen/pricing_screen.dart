@@ -8,7 +8,6 @@ import '../../widgets/app_bar/appbar_trailing_image.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'models/pricing_one_item_model.dart';
 import 'notifier/pricing_notifier.dart';
 import 'widgets/pricing_one_item_widget.dart';
 
@@ -174,26 +173,78 @@ class PricingScreenState extends ConsumerState<PricingScreen> {
           SizedBox(height: 26.h),
           Consumer(
             builder: (context, ref, _) {
-              return ListView.separated(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: 20.h);
-                },
-                itemCount: ref
-                        .watch(pricingNotifier)
-                        .pricingModelObj
-                        ?.pricingOneItemList
-                        .length ??
-                    0,
-                itemBuilder: (context, index) {
-                  PricingOneItemModel model = ref
-                          .watch(pricingNotifier)
-                          .pricingModelObj
-                          ?.pricingOneItemList[index] ??
-                      PricingOneItemModel();
-                  return PricingOneItemWidget(model);
+              final membershipsAsync = ref.watch(pricingMembershipsProvider);
+
+              return membershipsAsync.when(
+                loading: () => Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40.h),
+                    child: const CircularProgressIndicator(
+                      color: Color(0xFFFF6B35),
+                    ),
+                  ),
+                ),
+                error: (error, stack) => Padding(
+                  padding: EdgeInsets.all(20.h),
+                  child: Column(
+                    children: [
+                      Icon(Icons.error_outline, size: 48.h, color: Colors.red),
+                      SizedBox(height: 12.h),
+                      Text(
+                        'Error al cargar membresías',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        error.toString(),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      SizedBox(height: 16.h),
+                      ElevatedButton(
+                        onPressed: () =>
+                            ref.invalidate(pricingMembershipsProvider),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (memberships) {
+                  if (memberships.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.all(20.h),
+                      child: Column(
+                        children: [
+                          Icon(Icons.card_membership,
+                              size: 48.h, color: Colors.grey),
+                          SizedBox(height: 12.h),
+                          Text(
+                            'Próximamente disponible',
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Estamos preparando planes especiales para ti',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    separatorBuilder: (context, index) {
+                      return SizedBox(height: 20.h);
+                    },
+                    itemCount: memberships.length,
+                    itemBuilder: (context, index) {
+                      return PricingOneItemWidget(memberships[index]);
+                    },
+                  );
                 },
               );
             },

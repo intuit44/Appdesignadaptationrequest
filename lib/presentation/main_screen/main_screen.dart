@@ -9,7 +9,7 @@ import '../home_screen/widgets/fibro_home_content.dart';
 import '../cart_screen/cart_screen.dart';
 import 'widgets/search_screen.dart';
 import 'widgets/account_screen.dart';
-import 'widgets/shortcuts_screen.dart';
+import 'widgets/shortcuts_screen_crm.dart';
 
 // Export del searchControllerProvider para que se pueda usar
 export 'widgets/search_screen.dart' show searchControllerProvider;
@@ -40,7 +40,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       const HomeScreenContent(),
       const AccountScreen(),
       const CartScreen(),
-      const ShortcutsScreen(),
+      const ShortcutsScreenCRM(), // Conectada al CRM
     ];
   }
 

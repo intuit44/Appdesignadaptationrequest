@@ -100,80 +100,59 @@ class FibroProductCategories {
 }
 
 /// Categorías de Cursos/Entrenamientos de Fibro Academy
-/// Basado en la estructura de https://fibroacademyusa.com/courses/
+/// Las categorías son para navegación visual, los cursos vienen del CRM
 class FibroCourseCategories {
-  // IDs de categorías de cursos
-  static const String talleres = 'talleres';
-  static const String cursosCorporales = 'cursos-corporales';
-  static const String esteticaMedica = 'estetica-medica';
-  static const String talleresCosmeticos = 'talleres-cosmeticos';
+  // Tipos de productos en Agent CRM
+  static const String typeService = 'SERVICE'; // Talleres presenciales
+  static const String typeDigital = 'DIGITAL'; // Cursos online
+  static const String typeMembership = 'MEMBERSHIP'; // Membresías
 
   /// Lista de categorías de cursos con información visual
+  /// Los cursos reales vienen de Agent CRM, estas son solo las categorías UI
   static List<CourseCategoryInfo> get categories => [
         CourseCategoryInfo(
-          id: talleres,
-          name: 'Talleres',
-          subtitle: 'Workshops de Estética',
-          description: 'Aprende técnicas prácticas en sesiones intensivas',
+          id: 'all',
+          name: 'Todos los Cursos',
+          subtitle: 'Catálogo Completo',
+          description: 'Explora todos nuestros cursos y certificaciones',
           icon: Icons.school_outlined,
           color: const Color(0xFFFF6B35),
           imageUrl:
               'https://fibroacademyusa.com/wp-content/uploads/elementor/thumbs/c13-oz1s0yqmuyzxguan7vs6moalpdu19jypnyo4r8sgnw.png.webp',
-          courses: [
-            'Blanqueamiento Facial o Zonas Íntimas',
-            'Terapia Luz LED',
-            'Microagujas (Microneedling)',
-            'Facial con Aparatología',
-            'Blanqueamiento Dental Estético',
-            'Aparatología Corporal',
-            'Brazilian Wax',
-            'Estética Corporal',
-          ],
+          productType: null, // Todos
         ),
         CourseCategoryInfo(
-          id: cursosCorporales,
-          name: 'Cursos Corporales',
-          subtitle: 'Tratamientos de Cuerpo',
-          description: 'Especializate en tratamientos corporales avanzados',
-          icon: Icons.accessibility_new,
+          id: 'talleres',
+          name: 'Talleres',
+          subtitle: 'Workshops Presenciales',
+          description: 'Aprende técnicas prácticas en sesiones intensivas',
+          icon: Icons.people_outline,
           color: const Color(0xFF00BFA5),
           imageUrl:
               'https://fibroacademyusa.com/wp-content/uploads/elementor/thumbs/ESTETICA-CORPORAL-q97rox78v0f2qcbwpa2cwfgd2dy5ayaewx6wykjn18.png.webp',
-          courses: [
-            'Camuflaje de Estrías y Cicatrices',
-            'Madero Terapia',
-            'Tratamiento Vetónico',
-          ],
+          productType: typeService,
         ),
         CourseCategoryInfo(
-          id: esteticaMedica,
-          name: 'Estética Médica',
-          subtitle: 'Cursos Avanzados',
-          description: 'Certificaciones profesionales en técnicas médicas',
-          icon: Icons.medical_information_outlined,
+          id: 'cursos-online',
+          name: 'Cursos Online',
+          subtitle: 'Aprende desde casa',
+          description: 'Formación digital a tu ritmo',
+          icon: Icons.play_circle_outline,
           color: const Color(0xFF7E57C2),
           imageUrl:
               'https://fibroacademyusa.com/wp-content/uploads/elementor/thumbs/cbbg2-300x199-oz1sqrf6fab83ktol17l25y0m2ooiidijn7uwmjhwc.jpg',
-          courses: [
-            'Masterclass Plasma Fibroblast',
-            'Bio Nano',
-            'Hilos de Colágeno',
-            'Carboxy',
-          ],
+          productType: typeDigital,
         ),
         CourseCategoryInfo(
-          id: talleresCosmeticos,
-          name: 'Talleres Cosméticos',
-          subtitle: 'Belleza y Cosmetología',
-          description: 'Técnicas de embellecimiento facial',
-          icon: Icons.face,
+          id: 'membresías',
+          name: 'Membresías',
+          subtitle: 'Acceso Premium',
+          description: 'Contenido exclusivo y beneficios especiales',
+          icon: Icons.card_membership,
           color: const Color(0xFFFF8A65),
           imageUrl:
               'https://fibroacademyusa.com/wp-content/uploads/elementor/thumbs/c9-oz1s1ds1wbkimloss2a7qkhz7jrwopmf213wfo65wc.png.webp',
-          courses: [
-            'Keratina de Pestañas',
-            'Extensiones de Pestañas',
-          ],
+          productType: typeMembership,
         ),
       ];
 
@@ -207,6 +186,7 @@ class ProductCategoryInfo {
 }
 
 /// Información de una categoría de curso
+/// productType corresponde al tipo en Agent CRM: SERVICE, DIGITAL, MEMBERSHIP
 class CourseCategoryInfo {
   final String id;
   final String name;
@@ -214,8 +194,8 @@ class CourseCategoryInfo {
   final String description;
   final IconData icon;
   final Color color;
-  final List<String> courses;
   final String? imageUrl;
+  final String? productType; // Tipo en Agent CRM para filtrar
 
   const CourseCategoryInfo({
     required this.id,
@@ -224,15 +204,22 @@ class CourseCategoryInfo {
     required this.description,
     required this.icon,
     required this.color,
-    this.courses = const [],
     this.imageUrl,
+    this.productType,
   });
 }
 
 /// Información de contacto de Fibro Academy
+/// Datos reales del CRM Agent CRM Pro (GoHighLevel)
 class FibroContactInfo {
+  // Datos confirmados de GoHighLevel
+  static const String locationId = 'ejCxNhrdgxBxqjpDhGT6';
+  static const String domain = 'hub.fibrolovers.com';
+
+  // Contacto
   static const String address = '2684 NW 97th Ave, Doral, FL 33172';
-  static const String email = 'hello@fibroacademyusa.com';
+  static const String email = 'info@fibrolovers.com';
+  static const String emailSupport = 'hello@fibroacademyusa.com';
   static const String phone1 = '(305) 632-4630';
   static const String phone2 = '+1 (786) 707-7234';
   static const String whatsapp = '+17867077234';
@@ -241,13 +228,20 @@ class FibroContactInfo {
   static const String youtube = 'UCmHBMKOI-UYcry1TNQa4qjQ';
   static const String website = 'https://fibroacademyusa.com';
   static const String shopUrl = 'https://fibroacademyusa.com/shop/';
+  static const String hubUrl = 'https://hub.fibrolovers.com';
 
+  // URLs construidas
   static String get whatsappUrl =>
       'https://wa.me/$whatsapp?text=Hola,%20me%20interesa%20información%20sobre%20Fibro%20Academy';
   static String get instagramUrl => 'https://www.instagram.com/$instagram/';
   static String get facebookUrl => 'https://www.facebook.com/$facebook/';
   static String get youtubeUrl =>
       'https://www.youtube.com/channel/$youtube?app=desktop';
+
+  // Horarios de atención
+  static const String scheduleWeekdays = 'Lunes a Viernes: 9:00 AM - 6:00 PM';
+  static const String scheduleSaturday = 'Sábado: 10:00 AM - 3:00 PM';
+  static const String scheduleSunday = 'Domingo: Cerrado';
 }
 
 /// Colores de marca Fibro Academy

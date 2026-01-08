@@ -4,7 +4,7 @@
  * Integración de Gemini AI con datos en tiempo real de WooCommerce y Agent CRM
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContactInfo = exports.getOrCreateCustomer = exports.createOrder = exports.getOrders = exports.getUpcomingEvents = exports.getCourseDetail = exports.getCourses = exports.checkAvailability = exports.getCategories = exports.getProductDetail = exports.getProducts = exports.chat = void 0;
+exports.getMentors = exports.getAgentCRMProducts = exports.getTutorials = exports.getContactInfo = exports.getOrCreateCustomer = exports.createOrder = exports.getOrders = exports.getUpcomingEvents = exports.getCourseDetail = exports.getCourses = exports.checkAvailability = exports.getCategories = exports.getProductDetail = exports.getProducts = exports.chat = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const vertexai_1 = require("@google-cloud/vertexai");
@@ -522,6 +522,269 @@ exports.getContactInfo = (0, https_1.onCall)({ enforceAppCheck: false }, async (
                 facebook: "FibroAcademyUSA",
             },
         },
+    };
+});
+/**
+ * Cloud Function para obtener tutoriales
+ * Combina videos de Agent CRM con datos estáticos de la academia
+ */
+exports.getTutorials = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { category } = request.data || {};
+    try {
+        // Obtener cursos de Agent CRM que pueden tener videos
+        const courses = await agentCRM.getCourses({ limit: 50 });
+        // Categorías de tutoriales
+        const tutorialCategories = [
+            {
+                id: "getting-started",
+                title: "Primeros Pasos",
+                icon: "play_circle_outline",
+                color: "#FF5722",
+                tutorials: [
+                    {
+                        id: "welcome",
+                        title: "Bienvenida a Fibroskin Academy",
+                        description: "Conoce nuestra academia y lo que aprenderás.",
+                        duration: "5:30",
+                        videoUrl: "https://www.youtube.com/watch?v=fibro-welcome",
+                        thumbnailUrl: null,
+                        category: "getting-started",
+                        isAvailable: true,
+                    },
+                    {
+                        id: "navigation",
+                        title: "Cómo navegar la app",
+                        description: "Guía rápida de todas las funciones de la aplicación.",
+                        duration: "3:45",
+                        videoUrl: null,
+                        thumbnailUrl: null,
+                        category: "getting-started",
+                        isAvailable: true,
+                    },
+                    {
+                        id: "first-purchase",
+                        title: "Tu primera compra",
+                        description: "Paso a paso para comprar tus primeros productos.",
+                        duration: "4:20",
+                        videoUrl: null,
+                        thumbnailUrl: null,
+                        category: "getting-started",
+                        isAvailable: true,
+                    },
+                ],
+            },
+            {
+                id: "basic-techniques",
+                title: "Técnicas Básicas",
+                icon: "school_outlined",
+                color: "#26A69A",
+                tutorials: courses
+                    .filter((c) => c.category?.toLowerCase().includes("taller") ||
+                    c.name?.toLowerCase().includes("básico") ||
+                    c.name?.toLowerCase().includes("basico"))
+                    .slice(0, 5)
+                    .map((c) => ({
+                    id: c.id,
+                    title: c.name,
+                    description: c.description || "Aprende técnicas fundamentales de estética.",
+                    duration: c.duration || "Variable",
+                    videoUrl: c.imageUrl || null,
+                    thumbnailUrl: c.imageUrl || null,
+                    category: "basic-techniques",
+                    isAvailable: true,
+                })),
+            },
+            {
+                id: "advanced-techniques",
+                title: "Técnicas Avanzadas",
+                icon: "auto_awesome",
+                color: "#9C27B0",
+                tutorials: courses
+                    .filter((c) => c.category?.toLowerCase().includes("avanzado") ||
+                    c.name?.toLowerCase().includes("master") ||
+                    c.name?.toLowerCase().includes("microblading"))
+                    .slice(0, 5)
+                    .map((c) => ({
+                    id: c.id,
+                    title: c.name,
+                    description: c.description || "Técnicas avanzadas de micropigmentación.",
+                    duration: c.duration || "Variable",
+                    videoUrl: c.imageUrl || null,
+                    thumbnailUrl: c.imageUrl || null,
+                    category: "advanced-techniques",
+                    isAvailable: true,
+                })),
+            },
+            {
+                id: "business-marketing",
+                title: "Negocio y Marketing",
+                icon: "business_center_outlined",
+                color: "#FFA000",
+                tutorials: [
+                    {
+                        id: "portfolio",
+                        title: "Crea tu portafolio profesional",
+                        description: "Fotografía tus trabajos profesionalmente.",
+                        duration: "10:00",
+                        videoUrl: null,
+                        thumbnailUrl: null,
+                        category: "business-marketing",
+                        isAvailable: true,
+                    },
+                    {
+                        id: "social-media",
+                        title: "Marketing en redes sociales",
+                        description: "Estrategias para atraer más clientes.",
+                        duration: "14:30",
+                        videoUrl: null,
+                        thumbnailUrl: null,
+                        category: "business-marketing",
+                        isAvailable: true,
+                    },
+                    {
+                        id: "pricing",
+                        title: "Precios y presupuestos",
+                        description: "Cómo establecer tus tarifas competitivamente.",
+                        duration: "8:00",
+                        videoUrl: null,
+                        thumbnailUrl: null,
+                        category: "business-marketing",
+                        isAvailable: true,
+                    },
+                ],
+            },
+        ];
+        // Agregar tutoriales adicionales basados en cursos que tengan videos
+        const videoCourses = courses.filter((c) => c.imageUrl);
+        if (videoCourses.length > 0) {
+            tutorialCategories.push({
+                id: "featured-courses",
+                title: "Cursos Destacados",
+                icon: "star_outline",
+                color: "#2196F3",
+                tutorials: videoCourses.slice(0, 6).map((c) => ({
+                    id: c.id,
+                    title: c.name,
+                    description: c.description || `Curso profesional: ${c.name}`,
+                    duration: c.duration || "Consultar",
+                    videoUrl: c.imageUrl,
+                    thumbnailUrl: c.imageUrl,
+                    category: "featured-courses",
+                    isAvailable: true,
+                })),
+            });
+        }
+        // Filtrar por categoría si se especifica
+        let result = tutorialCategories;
+        if (category) {
+            result = tutorialCategories.filter((c) => c.id === category);
+        }
+        return {
+            success: true,
+            categories: result,
+            totalTutorials: result.reduce((sum, c) => sum + c.tutorials.length, 0),
+        };
+    }
+    catch (error) {
+        console.error("Error obteniendo tutoriales:", error);
+        // Retornar tutoriales estáticos de fallback
+        return {
+            success: true,
+            categories: [
+                {
+                    id: "getting-started",
+                    title: "Primeros Pasos",
+                    icon: "play_circle_outline",
+                    color: "#FF5722",
+                    tutorials: [
+                        {
+                            id: "welcome",
+                            title: "Bienvenida a Fibroskin Academy",
+                            description: "Conoce nuestra academia y lo que aprenderás.",
+                            duration: "5:30",
+                            videoUrl: null,
+                            thumbnailUrl: null,
+                            category: "getting-started",
+                            isAvailable: false,
+                        },
+                    ],
+                },
+            ],
+            totalTutorials: 1,
+        };
+    }
+});
+// ==================== PRODUCTOS AGENT CRM ====================
+/**
+ * Cloud Function para obtener productos de Agent CRM (cursos/membresías)
+ */
+exports.getAgentCRMProducts = (0, https_1.onCall)({ enforceAppCheck: false }, async (request) => {
+    const { type, limit = 50 } = request.data || {};
+    try {
+        const products = await agentCRM.getCourses({ limit });
+        let result = products;
+        // Filtrar por tipo si se especifica
+        if (type === "courses") {
+            result = products.filter((p) => !p.name?.toLowerCase().includes("membresía"));
+        }
+        else if (type === "memberships") {
+            result = products.filter((p) => p.name?.toLowerCase().includes("membresía"));
+        }
+        return {
+            success: true,
+            products: result,
+            total: result.length,
+        };
+    }
+    catch (error) {
+        console.error("Error obteniendo productos de Agent CRM:", error);
+        throw new https_1.HttpsError("internal", "Error obteniendo productos de Agent CRM");
+    }
+});
+/**
+ * Cloud Function para obtener información de mentores/instructores
+ */
+exports.getMentors = (0, https_1.onCall)({ enforceAppCheck: false }, async () => {
+    // Mentores/instructores de Fibro Academy
+    const mentors = [
+        {
+            id: "1",
+            name: "Fibro Academy Team",
+            title: "Equipo de Instructores",
+            bio: "Nuestro equipo de instructores certificados con años de experiencia en micropigmentación, estética facial y corporal.",
+            imageUrl: null,
+            specialties: ["Microblading", "Micropigmentación", "Estética Facial", "Tratamientos Corporales"],
+            socialLinks: {
+                instagram: "@fibroacademyusa",
+            },
+        },
+        {
+            id: "2",
+            name: "Master Trainer",
+            title: "Instructor Principal",
+            bio: "Especialista en técnicas avanzadas de micropigmentación con certificaciones internacionales.",
+            imageUrl: null,
+            specialties: ["Microblading Avanzado", "Powder Brows", "Lip Blushing", "Correcciones"],
+            socialLinks: {
+                instagram: "@fibroacademyusa",
+            },
+        },
+        {
+            id: "3",
+            name: "Beauty Expert",
+            title: "Especialista en Skincare",
+            bio: "Experta en tratamientos faciales y protocolos de skincare profesional.",
+            imageUrl: null,
+            specialties: ["Skincare Profesional", "Faciales", "Peelings", "Hidratación"],
+            socialLinks: {
+                instagram: "@fibroacademyusa",
+            },
+        },
+    ];
+    return {
+        success: true,
+        mentors,
+        total: mentors.length,
     };
 });
 //# sourceMappingURL=index.js.map

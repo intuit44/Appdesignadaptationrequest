@@ -11,6 +11,7 @@ import '../presentation/fibro_shop_screen/fibro_shop_screen.dart';
 import '../presentation/help_screen/help_screen.dart';
 import '../presentation/home_screen/home_screen.dart';
 import '../presentation/main_screen/main_screen.dart';
+import '../presentation/membership_portal_screen/membership_portal_screen.dart';
 import '../presentation/mentor_profile_screen/mentor_profile_screen.dart';
 import '../presentation/mentors_screen/mentors_screen.dart';
 import '../presentation/orders_screen/orders_screen.dart';
@@ -78,6 +79,7 @@ class AppRoutes {
   static const String helpScreen = '/help_screen';
   static const String tutorialsScreen = '/tutorials_screen';
   static const String chatbotScreen = '/chatbot_screen';
+  static const String membershipPortalScreen = '/membership_portal_screen';
 
   static const String initialRoute = '/initialRoute';
 
@@ -104,6 +106,7 @@ class AppRoutes {
     helpScreen: (context) => const HelpScreen(),
     tutorialsScreen: (context) => const TutorialsScreen(),
     chatbotScreen: (context) => const ChatbotScreen(),
+    membershipPortalScreen: (context) => const MembershipPortalScreen(),
     initialRoute: (context) => const MainScreen(),
   };
 

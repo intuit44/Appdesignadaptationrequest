@@ -110,6 +110,8 @@ class AgentCRMProduct {
   final List<AgentCRMProductVariant> variants;
   final bool isTaxesEnabled;
   final bool taxInclusive;
+  final bool recurring; // Es suscripción recurrente
+  final String? interval; // month, year, week, etc.
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -125,6 +127,8 @@ class AgentCRMProduct {
     this.variants = const [],
     this.isTaxesEnabled = false,
     this.taxInclusive = false,
+    this.recurring = false,
+    this.interval,
     this.createdAt,
     this.updatedAt,
   });
@@ -156,6 +160,8 @@ class AgentCRMProduct {
           [],
       isTaxesEnabled: json['isTaxesEnabled'] ?? false,
       taxInclusive: json['taxInclusive'] ?? false,
+      recurring: json['recurring'] ?? json['isRecurring'] ?? false,
+      interval: json['interval'] ?? json['billingInterval'],
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,

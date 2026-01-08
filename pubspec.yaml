@@ -33,9 +33,10 @@ dependencies:
   # WebView (para checkout)
   webview_flutter: ^4.5.0
   
-  # Video (para cursos)
+  # Video (para cursos - Apple App Store compliant)
   video_player: ^2.8.2
   chewie: ^1.7.4
+  youtube_player_flutter: ^9.1.1
   
   # Utilidades
   json_annotation: ^4.8.1

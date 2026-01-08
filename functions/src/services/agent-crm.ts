@@ -113,8 +113,8 @@ export class AgentCRMAPI {
       }));
     } catch (error) {
       console.error("AgentCRM getCourses error:", error);
-      // Retornar datos estáticos si la API falla
-      return this.getStaticCourses(params);
+      // NO devolver datos estáticos - solo datos reales
+      throw error;
     }
   }
 
@@ -214,81 +214,9 @@ export class AgentCRMAPI {
       return allEvents.slice(0, limit);
     } catch (error) {
       console.error("AgentCRM getUpcomingEvents error:", error);
-      return this.getStaticEvents(limit);
+      // NO devolver datos estáticos - solo datos reales
+      throw error;
     }
-  }
-
-  /**
-   * Datos estáticos de cursos como fallback
-   */
-  private getStaticCourses(params: GetCoursesParams): Course[] {
-    const allCourses: Course[] = [
-      // Talleres
-      { id: "taller-mesoterapia", name: "Taller de Mesoterapia", description: "Aprende técnicas avanzadas de mesoterapia facial y corporal", price: 450, priceFormatted: "$450.00", category: "Talleres", imageUrl: null, duration: "8 horas", availability: "Disponible" },
-      { id: "taller-hydragloss", name: "Taller Hydra Gloss", description: "Técnica de hidratación profunda con efecto glass skin", price: 350, priceFormatted: "$350.00", category: "Talleres", imageUrl: null, duration: "6 horas", availability: "Disponible" },
-      { id: "taller-microblading", name: "Taller de Microblading", description: "Certificación completa en microblading de cejas", price: 800, priceFormatted: "$800.00", category: "Talleres", imageUrl: null, duration: "2 días", availability: "Disponible" },
-      { id: "taller-pdo-threads", name: "Taller PDO Threads", description: "Hilos tensores para rejuvenecimiento facial", price: 600, priceFormatted: "$600.00", category: "Talleres", imageUrl: null, duration: "8 horas", availability: "Disponible" },
-      { id: "taller-skincare", name: "Taller de Skincare", description: "Fundamentos del cuidado profesional de la piel", price: 300, priceFormatted: "$300.00", category: "Talleres", imageUrl: null, duration: "6 horas", availability: "Disponible" },
-      // Cursos Corporales
-      { id: "curso-fibrolight", name: "Curso Fibrolight", description: "Técnica exclusiva de tratamiento corporal con luz", price: 500, priceFormatted: "$500.00", category: "Cursos Corporales", imageUrl: null, duration: "8 horas", availability: "Disponible" },
-      { id: "curso-butt-lift", name: "Curso Butt Lift", description: "Técnicas de levantamiento de glúteos no invasivo", price: 450, priceFormatted: "$450.00", category: "Cursos Corporales", imageUrl: null, duration: "6 horas", availability: "Disponible" },
-      { id: "curso-body-contour", name: "Curso Body Contour", description: "Moldeo corporal profesional", price: 550, priceFormatted: "$550.00", category: "Cursos Corporales", imageUrl: null, duration: "8 horas", availability: "Disponible" },
-      // Estética Médica
-      { id: "curso-plasma-rico", name: "Curso Plasma Rico (PRP)", description: "Tratamiento con plasma rico en plaquetas", price: 700, priceFormatted: "$700.00", category: "Estética Médica", imageUrl: null, duration: "8 horas", availability: "Disponible" },
-      { id: "curso-acido-hialuronico", name: "Curso Ácido Hialurónico", description: "Aplicación de rellenos dérmicos", price: 900, priceFormatted: "$900.00", category: "Estética Médica", imageUrl: null, duration: "2 días", availability: "Disponible" },
-      { id: "curso-botox", name: "Curso de Botox", description: "Certificación en aplicación de toxina botulínica", price: 1000, priceFormatted: "$1,000.00", category: "Estética Médica", imageUrl: null, duration: "2 días", availability: "Disponible" },
-    ];
-
-    let filtered = allCourses;
-
-    if (params.category) {
-      filtered = filtered.filter((c) => this.matchCourseCategory(c.name, params.category!));
-    }
-
-    if (params.search) {
-      const searchLower = params.search.toLowerCase();
-      filtered = filtered.filter(
-        (c) =>
-          c.name.toLowerCase().includes(searchLower) ||
-          c.description.toLowerCase().includes(searchLower)
-      );
-    }
-
-    return filtered.slice(0, params.limit || 10);
-  }
-
-  /**
-   * Eventos estáticos como fallback
-   */
-  private getStaticEvents(limit: number): Event[] {
-    const now = new Date();
-    const events: Event[] = [];
-
-    // Generar eventos para las próximas semanas
-    const eventTypes = [
-      { title: "Taller de Mesoterapia", type: "Taller" },
-      { title: "Curso PDO Threads", type: "Curso" },
-      { title: "Taller Skincare Profesional", type: "Taller" },
-      { title: "Curso de Body Contour", type: "Curso" },
-    ];
-
-    for (let i = 0; i < limit; i++) {
-      const eventDate = new Date(now);
-      eventDate.setDate(eventDate.getDate() + (i + 1) * 7); // Cada semana
-      const eventType = eventTypes[i % eventTypes.length];
-
-      events.push({
-        id: `event-${i}`,
-        title: eventType.title,
-        description: `${eventType.type} presencial en Fibro Academy USA`,
-        startTime: `${eventDate.toISOString().split("T")[0]}T09:00:00`,
-        endTime: `${eventDate.toISOString().split("T")[0]}T17:00:00`,
-        location: "Fibro Academy USA - 2684 NW 97th Ave, Doral, FL",
-        type: eventType.type,
-      });
-    }
-
-    return events;
   }
 
   /**

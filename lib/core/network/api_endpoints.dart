@@ -24,6 +24,10 @@ class ApiEndpoints {
       '$cloudFunctionsUrl/getOrCreateCustomer';
   static const String cfGetContactInfo = '$cloudFunctionsUrl/getContactInfo';
   static const String cfChat = '$cloudFunctionsUrl/chat';
+  static const String cfGetTutorials = '$cloudFunctionsUrl/getTutorials';
+  static const String cfGetAgentCRMProducts =
+      '$cloudFunctionsUrl/getAgentCRMProducts';
+  static const String cfGetMentors = '$cloudFunctionsUrl/getMentors';
 
   // WooCommerce REST API (legacy - mantener para compatibilidad)
   static const String wcApiVersion = 'wc/v3';

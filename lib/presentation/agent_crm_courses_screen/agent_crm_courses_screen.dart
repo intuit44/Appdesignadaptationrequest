@@ -6,6 +6,7 @@ import '../../widgets/agent_crm_course_card.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
+import '../membership_portal_screen/membership_portal_screen.dart';
 import 'agent_crm_course_detail_screen.dart';
 
 /// Pantalla de lista de cursos de Agent CRM Pro
@@ -53,6 +54,7 @@ class _AgentCRMCoursesScreenState extends ConsumerState<AgentCRMCoursesScreen>
         appBar: _buildAppBar(),
         body: Column(
           children: [
+            _buildMyCoursesButton(),
             _buildSearchBar(),
             _buildTabBar(),
             Expanded(
@@ -67,6 +69,44 @@ class _AgentCRMCoursesScreenState extends ConsumerState<AgentCRMCoursesScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Botón destacado para abrir el portal de cursos (member.fibrolovers.com)
+  Widget _buildMyCoursesButton() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 12.h),
+      color: appTheme.whiteA700,
+      child: ElevatedButton.icon(
+        onPressed: _openMembershipPortal,
+        icon: const Icon(Icons.play_circle_filled, size: 24),
+        label: const Text(
+          'Ver Mis Cursos',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: appTheme.deepOrange400,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 14.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.h),
+          ),
+          elevation: 2,
+        ),
+      ),
+    );
+  }
+
+  void _openMembershipPortal() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MembershipPortalScreen(),
       ),
     );
   }

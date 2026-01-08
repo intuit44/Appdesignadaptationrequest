@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/app_export.dart';
 import '../../../core/providers/auth_state_provider.dart';
@@ -152,7 +153,7 @@ class ShortcutsScreen extends ConsumerWidget {
                 label: 'Membresía',
                 color: Colors.amber.shade700,
                 onTap: () =>
-                    NavigatorService.pushNamed(AppRoutes.agentCRMCoursesScreen),
+                    NavigatorService.pushNamed(AppRoutes.pricingScreen),
               ),
               _buildShortcutItem(
                 icon: Icons.location_on_outlined,
@@ -386,21 +387,47 @@ class ShortcutsScreen extends ConsumerWidget {
                   icon: Icons.chat_bubble_outline,
                   title: 'Chat en Vivo',
                   subtitle: 'Habla con un asesor',
-                  onTap: () {},
+                  onTap: () =>
+                      NavigatorService.pushNamed(AppRoutes.chatbotScreen),
                 ),
                 Divider(height: 1, indent: 56.h),
                 _buildSupportItem(
                   icon: Icons.phone_outlined,
                   title: 'Llamar',
-                  subtitle: '+1 (786) 123-4567',
-                  onTap: () {},
+                  subtitle: FibroContactInfo.phone1,
+                  onTap: () async {
+                    final uri = Uri.parse('tel:${FibroContactInfo.phone1}');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                  },
                 ),
                 Divider(height: 1, indent: 56.h),
                 _buildSupportItem(
                   icon: Icons.email_outlined,
                   title: 'Email',
-                  subtitle: 'info@fibroacademyusa.com',
-                  onTap: () {},
+                  subtitle: FibroContactInfo.email,
+                  onTap: () async {
+                    final uri = Uri.parse('mailto:${FibroContactInfo.email}');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                  },
+                ),
+                Divider(height: 1, indent: 56.h),
+                _buildSupportItem(
+                  icon: Icons.people_outline,
+                  title: 'Nuestros Mentores',
+                  subtitle: 'Conoce al equipo de instructores',
+                  onTap: () =>
+                      NavigatorService.pushNamed(AppRoutes.mentorsScreen),
+                ),
+                Divider(height: 1, indent: 56.h),
+                _buildSupportItem(
+                  icon: Icons.help_outline,
+                  title: 'Centro de Ayuda',
+                  subtitle: 'Preguntas frecuentes',
+                  onTap: () => NavigatorService.pushNamed(AppRoutes.helpScreen),
                 ),
               ],
             ),
